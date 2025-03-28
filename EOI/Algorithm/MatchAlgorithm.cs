@@ -186,6 +186,60 @@ namespace EOI.Algorithm
             return matchedPositions.Count;
         }
 
+        // ✅ 여러 템플릿 중 최적 single 찾기
+        public bool MatchTemplateBestSingle(Mat image, Point leftTopPos, List<Mat> templateList)
+        {
+            if (templateList == null || templateList.Count == 0)
+                return false;
+
+            Mat bestTemplate = null;
+            int bestScore = MatchScore;
+            Point bestPoint = new Point(0, 0);
+
+            foreach (var template in templateList)
+            {
+                SetTemplateImage(template);
+                if (MatchTemplateSingle(image, leftTopPos))  // ← 개선된 버전 호출
+                {
+                    if (OutScore > bestScore)
+                    {
+                        bestScore = OutScore;
+                        bestTemplate = template.Clone();
+                        bestPoint = OutPoint;
+                    }
+                }
+            }
+
+            if (bestTemplate != null)
+            {
+                SetTemplateImage(bestTemplate);
+                OutScore = bestScore;
+                OutPoint = bestPoint;
+                return true;
+            }
+
+            return false;
+        }
+
+        public int MatchTemplateBestMultiple(Mat image, Point leftTopPos, List<Mat> templateList, out List<Point> matchedPoints)
+        {
+            matchedPoints = new List<Point>();
+            if (templateList == null || templateList.Count == 0)
+                return 0;
+
+            List<Point> allMatches = new List<Point>();
+
+            foreach (var template in templateList)
+            {
+                SetTemplateImage(template);
+                if (MatchTemplateMultiple(image, leftTopPos, out List<Point> points) > 0)
+                    allMatches.AddRange(points);
+            }
+
+            OutPoints = allMatches;
+            return allMatches.Count;
+        }
+
         //#ABSTRACT ALGORITHM#3 매칭 알고리즘 검사 구현
         public override bool DoInspect()
         {
