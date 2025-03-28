@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Policy;
 
-namespace JidamVision.Util
+namespace EOI.Util
 {
     public static class NetHelper
     {

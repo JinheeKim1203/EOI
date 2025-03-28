@@ -1,5 +1,5 @@
-﻿using JidamVision.Core;
-using JidamVision.Setting;
+﻿using EOI.Core;
+using EOI.Setting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision
+namespace EOI
 {
     /*
      #MODEL SAVE# - <<<XmlHelper를 이용하여, 모델 저장>>>

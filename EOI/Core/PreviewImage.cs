@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using JidamVision.Property;
-using JidamVision.Teach;
+using EOI.Property;
+using EOI.Teach;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 
-namespace JidamVision.Core
+namespace EOI.Core
 {
     enum ImageOperation
     {

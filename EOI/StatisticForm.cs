@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace JidamVision
+namespace EOI
 {
     public partial class StatisticForm : DockContent
     {

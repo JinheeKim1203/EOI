@@ -1,10 +1,10 @@
-﻿using JidamVision.Core;
+﻿using EOI.Core;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 
-namespace JidamVision.Algorithm
+namespace EOI.Algorithm
 {
     //#BINARY FILTER#1 이진화 필터를 위한 클래스
 

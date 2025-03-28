@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using BrightIdeasSoftware;
-using JidamVision.Inspect;
-using JidamVision.Core;
-using JidamVision.Teach;
+using EOI.Inspect;
+using EOI.Core;
+using EOI.Teach;
 using OpenCvSharp;
 
-namespace JidamVision
+namespace EOI
 {
     /*
     #RESULT FORM# - <<<검사결과를 보기 위해, 트리 리스트 뷰에 출력하는 기능 개발>>> 

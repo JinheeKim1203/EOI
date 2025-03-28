@@ -1,5 +1,5 @@
-﻿using JidamVision.Grab;
-using JidamVision.Util;
+﻿using EOI.Grab;
+using EOI.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision.Setting
+namespace EOI.Setting
 {
     //#SETUP#3 환경설정창에 추가할 카메라설정 UserContorl 추가
     //카메라 타입 설정

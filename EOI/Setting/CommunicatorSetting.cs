@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using JidamVision.Grab;
-using JidamVision.Util;
-using JidamVision.Sequence;
+using EOI.Grab;
+using EOI.Util;
+using EOI.Sequence;
 
-namespace JidamVision.Setting
+namespace EOI.Setting
 {
     public partial class CommunicatorSetting: UserControl
     {

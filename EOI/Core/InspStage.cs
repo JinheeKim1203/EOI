@@ -1,10 +1,10 @@
-﻿using JidamVision.Algorithm;
-using JidamVision.Grab;
-using JidamVision.Inspect;
-using JidamVision.Sequence;
-using JidamVision.Setting;
-using JidamVision.Teach;
-using JidamVision.Util;
+﻿using EOI.Algorithm;
+using EOI.Grab;
+using EOI.Inspect;
+using EOI.Sequence;
+using EOI.Setting;
+using EOI.Teach;
+using EOI.Util;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision.Core
+namespace EOI.Core
 {
     //검사와 관련된 클래스를 관리하는 클래스
     public class InspStage : IDisposable

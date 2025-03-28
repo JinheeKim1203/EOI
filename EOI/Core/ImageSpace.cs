@@ -7,10 +7,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using JidamVision.Util;
+using EOI.Util;
 using System.Diagnostics.Eventing.Reader;
 
-namespace JidamVision.Core
+namespace EOI.Core
 {
     public enum eImageChannel : int
     {

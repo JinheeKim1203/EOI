@@ -1,6 +1,6 @@
 ﻿using Common.Util.Helpers;
-using JidamVision.Grab;
-using JidamVision.Sequence;
+using EOI.Grab;
+using EOI.Sequence;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,9 +8,9 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
-using JidamVision.Core;
+using EOI.Core;
 
-namespace JidamVision.Setting
+namespace EOI.Setting
 {
     /*
     #SETUP# - <<<환경설정 정보를 저장하기 위한 클래스>>> 

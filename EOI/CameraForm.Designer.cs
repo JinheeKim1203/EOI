@@ -1,4 +1,4 @@
-﻿namespace JidamVision
+﻿namespace EOI
 {
     partial class CameraForm
     {
@@ -41,7 +41,7 @@
             this.chkCycle = new System.Windows.Forms.CheckBox();
             this.chkPreview = new System.Windows.Forms.CheckBox();
             this.chkShowROI = new System.Windows.Forms.CheckBox();
-            this.imageViewer = new JidamVision.ImageViewCCtrl();
+            this.imageViewer = new EOI.ImageViewCCtrl();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 

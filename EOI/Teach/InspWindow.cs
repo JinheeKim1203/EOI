@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JidamVision.Algorithm;
+using EOI.Algorithm;
 using OpenCvSharp;
-using JidamVision.Core;
+using EOI.Core;
 using System.Security.Policy;
 using System.Drawing;
 using System.IO;
 using System.Xml.Serialization;
-using JidamVision.Setting;
+using EOI.Setting;
 using System.Xml.Linq;
-using JidamVision.Inspect;
+using EOI.Inspect;
 
-namespace JidamVision.Teach
+namespace EOI.Teach
 {
     //#MATCH PROP#3 InspWindow 클래스 추가, ROI 관리 및 검사를 처리하는 클래스
     //검사 알고리즘를 관리하는 클래스

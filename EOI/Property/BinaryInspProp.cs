@@ -1,6 +1,6 @@
-﻿using JidamVision.Algorithm;
-using JidamVision.Core;
-using JidamVision.Teach;
+﻿using EOI.Algorithm;
+using EOI.Core;
+using EOI.Teach;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.MonthCalendar;
 
-namespace JidamVision.Property
+namespace EOI.Property
 {
     /*
     #BINARY FILTER# - <<<이진화 검사 개발>>> 

@@ -1,4 +1,4 @@
-﻿namespace JidamVision.Property
+﻿namespace EOI.Property
 {
     partial class BinaryInspProp
     {

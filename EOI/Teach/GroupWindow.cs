@@ -1,4 +1,4 @@
-﻿using JidamVision.Algorithm;
+﻿using EOI.Algorithm;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace JidamVision.Teach
+namespace EOI.Teach
 {
     /*
     #GROUP ROI# - <<<계층 구조를 가지는 ROI 그룹을 관리하는 클래스 만들기>>> 

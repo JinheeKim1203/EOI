@@ -1,6 +1,6 @@
-﻿using JidamVision.Algorithm;
-using JidamVision.Property;
-using JidamVision.Teach;
+﻿using EOI.Algorithm;
+using EOI.Property;
+using EOI.Teach;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
 
-namespace JidamVision.Inspect
+namespace EOI.Inspect
 {
     public class InspectBoard
     {

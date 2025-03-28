@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JidamVision.Teach
+namespace EOI.Teach
 {
     //#MULTI ROI#1 ImageViewer에 표시되는 ROI정보를 관리하는 클래스
     public class DiagramEntity

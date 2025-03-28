@@ -1,6 +1,6 @@
 ﻿using WeifenLuo.WinFormsUI.Docking;
 
-namespace JidamVision
+namespace EOI
 {
     partial class PropertiesForm : DockContent
     {

@@ -8,14 +8,14 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using JidamVision.Algorithm;
-using JidamVision.Core;
-using JidamVision.Teach;
+using EOI.Algorithm;
+using EOI.Core;
+using EOI.Teach;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using static System.Windows.Forms.MonthCalendar;
 
-namespace JidamVision.Property
+namespace EOI.Property
 {
     /*
     #MATCH PROP# - <<<템플릿 매칭 개발>>> 

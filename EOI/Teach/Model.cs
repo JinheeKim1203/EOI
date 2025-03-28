@@ -1,7 +1,7 @@
 ﻿using Common.Util.Helpers;
-using JidamVision.Algorithm;
-using JidamVision.Core;
-using JidamVision.Setting;
+using EOI.Algorithm;
+using EOI.Core;
+using EOI.Setting;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace JidamVision.Teach
+namespace EOI.Teach
 {
     /*
     #MODEL# - <<<티칭 정보를 저장,관리하기 위한 클래스 만들기>>> 

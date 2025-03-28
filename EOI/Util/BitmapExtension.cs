@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using OpenCvSharp;
 using System.Runtime.InteropServices;
 
-namespace JidamVision.Util
+namespace EOI.Util
 {
     public static class BitmapExtension
     {

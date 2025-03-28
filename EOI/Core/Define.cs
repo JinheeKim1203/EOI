@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JidamVision.Core
+namespace EOI.Core
 {
     public enum MachineType
     {

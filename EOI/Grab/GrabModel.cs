@@ -1,4 +1,4 @@
-﻿using JidamVision.Util;
+﻿using EOI.Util;
 using MvCamCtrl.NET;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static MvCamCtrl.NET.MyCamera;
 
-namespace JidamVision.Grab
+namespace EOI.Grab
 {
     public enum CameraType
     {

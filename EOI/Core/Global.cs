@@ -1,4 +1,4 @@
-﻿using JidamVision.Grab;
+﻿using EOI.Grab;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Text;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 
-namespace JidamVision.Core
+namespace EOI.Core
 {
     //싱글톤을 이용하여, 전역적으로 쉽게 접근하는 클래스
     public class Global : IDisposable

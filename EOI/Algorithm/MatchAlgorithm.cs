@@ -1,7 +1,7 @@
-﻿using JidamVision.Core;
-using JidamVision.Setting;
-using JidamVision.Teach;
-using JidamVision.Util;
+﻿using EOI.Core;
+using EOI.Setting;
+using EOI.Teach;
+using EOI.Util;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision.Algorithm
+namespace EOI.Algorithm
 {
     //#MATCH PROP#2 MatchAlgorithm 클래스 추가, InspAlgorithm상속 받기
     //템플릿 매칭에 사용될 속성과 함수 정의

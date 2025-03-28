@@ -1,4 +1,4 @@
-﻿namespace JidamVision.Setting
+﻿namespace EOI.Setting
 {
     partial class CameraSetting
     {

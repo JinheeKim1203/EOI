@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using OpenCvSharp;
-using JidamVision.Core;
-using JidamVision.Teach;
+using EOI.Core;
+using EOI.Teach;
 using System.Security.Policy;
 
-namespace JidamVision.Algorithm
+namespace EOI.Algorithm
 {
     /*
     #ABSTRACT ALGORITHM# - <<<검사 알고리즘 추상화 개발>>> 

@@ -1,5 +1,5 @@
-﻿using JidamVision.Setting;
-using JidamVision.Util;
+﻿using EOI.Setting;
+using EOI.Util;
 using MessagingLibrary;
 using MessagingLibrary.MessageInterface;
 using System;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Web.Hosting;
 using static MessagingLibrary.Message;
 
-namespace JidamVision.Sequence
+namespace EOI.Sequence
 {
     public enum SeqCmd
     {

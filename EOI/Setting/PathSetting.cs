@@ -1,5 +1,5 @@
-﻿using JidamVision.Grab;
-using JidamVision.Util;
+﻿using EOI.Grab;
+using EOI.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision.Setting
+namespace EOI.Setting
 {
     //#SETUP#4 환경설정창에 추가할 경로설정 UserContorl 추가
     //모델에서 사용하는 모든 경로 설정

@@ -1,5 +1,5 @@
-﻿using JidamVision.Core;
-using JidamVision.Teach;
+﻿using EOI.Core;
+using EOI.Teach;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
 
-namespace JidamVision.Inspect
+namespace EOI.Inspect
 {
     //#RESULT FORM#1 검사 결과를 저장하기 위한 클래스
     public class InspResult

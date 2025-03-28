@@ -8,16 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using JidamVision.Core;
+using EOI.Core;
 using OpenCvSharp.Extensions;
 using System.Web;
-using JidamVision.Teach;
+using EOI.Teach;
 using System.IO;
 using OpenCvSharp;
-using JidamVision.Util;
+using EOI.Util;
 using System.Diagnostics.Eventing.Reader;
 
-namespace JidamVision
+namespace EOI
 {
     public partial class CameraForm : DockContent
     {

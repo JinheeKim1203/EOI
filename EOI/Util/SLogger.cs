@@ -10,9 +10,9 @@ using log4net.Appender;
 using log4net.Repository;
 using log4net.Repository.Hierarchy;
 using OpenCvSharp;
-using static JidamVision.Util.SLogger;
+using static EOI.Util.SLogger;
 
-namespace JidamVision.Util
+namespace EOI.Util
 {
     //#LOGFORM#1 log4net을 이용한 로그 저장 클래스
     public static class SLogger

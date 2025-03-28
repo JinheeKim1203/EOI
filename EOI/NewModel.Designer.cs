@@ -1,4 +1,4 @@
-﻿namespace JidamVision
+﻿namespace EOI
 {
     partial class NewModel
     {

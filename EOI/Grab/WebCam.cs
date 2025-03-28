@@ -1,4 +1,4 @@
-﻿using JidamVision.Util;
+﻿using EOI.Util;
 using MvCamCtrl.NET;
 using OpenCvSharp;
 using System;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace JidamVision.Grab
+namespace EOI.Grab
 {
     internal class WebCam : GrabModel
     {

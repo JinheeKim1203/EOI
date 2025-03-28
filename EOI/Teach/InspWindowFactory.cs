@@ -1,11 +1,11 @@
-﻿using JidamVision.Core;
+﻿using EOI.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JidamVision.Teach
+namespace EOI.Teach
 {
     //#MODEL#2 InspWindow를 유니크한 이름으로 관리하기 위한, InspWindow 생성 클래스
     public class InspWindowFactory

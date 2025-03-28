@@ -1,6 +1,6 @@
-﻿using JidamVision.Core;
-using JidamVision.Setting;
-using JidamVision.Util;
+﻿using EOI.Core;
+using EOI.Setting;
+using EOI.Util;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace JidamVision
+namespace EOI
 {
     public partial class MainForm : Form
     {

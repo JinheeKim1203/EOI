@@ -1,6 +1,6 @@
 ﻿using Common.Util.Helpers;
-using JidamVision.Setting;
-using JidamVision.Util;
+using EOI.Setting;
+using EOI.Util;
 using MessagingLibrary;
 using MessagingLibrary.MessageInterface;
 using MessagingLibrary.Model;
@@ -11,7 +11,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JidamVision.Sequence
+namespace EOI.Sequence
 {
     public enum CommunicatorType
     {

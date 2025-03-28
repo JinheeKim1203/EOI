@@ -1,4 +1,4 @@
-﻿using JidamVision.Property;
+﻿using EOI.Property;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision.Setting
+namespace EOI.Setting
 {
 
     //#SETUP#2 환경설정창 종류를 구분하기 위한 타입 설정

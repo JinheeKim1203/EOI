@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using JidamVision.Property;
-using JidamVision.Core;
-using JidamVision.Teach;
-using JidamVision.Algorithm;
+using EOI.Property;
+using EOI.Core;
+using EOI.Teach;
+using EOI.Algorithm;
 
-namespace JidamVision
+namespace EOI
 {
     /*
     #PANEL TO TAB# - <<<패널 방식을 모든 속성을 한번에 볼 수 있는 탭 방식으로 변경>>> 

@@ -1,7 +1,7 @@
-﻿using JidamVision.Algorithm;
-using JidamVision.Core;
-using JidamVision.Teach;
-using JidamVision.Util;
+﻿using EOI.Algorithm;
+using EOI.Core;
+using EOI.Teach;
+using EOI.Util;
 using OpenCvSharp;
 using System;
 using System.Collections.Concurrent;
@@ -12,9 +12,9 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static JidamVision.Core.ImageSpace;
+using static EOI.Core.ImageSpace;
 
-namespace JidamVision.Inspect
+namespace EOI.Inspect
 {
     /*
     #INSP WORKER# - <<<검사 알고리즘 통합 및 검사 관리 클래스 추가>>> 

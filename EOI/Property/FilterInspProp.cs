@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace JidamVision.Property
+namespace EOI.Property
 {
 
     public partial class FilterInspProp : UserControl

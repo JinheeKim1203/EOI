@@ -1,4 +1,4 @@
-﻿using JidamVision.Util;
+﻿using EOI.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,9 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using static JidamVision.Util.SLogger;
+using static EOI.Util.SLogger;
 
-namespace JidamVision
+namespace EOI
 {
     /*
     #LOGFORM# - <<<로그 저장하는 기능 개발>>> 

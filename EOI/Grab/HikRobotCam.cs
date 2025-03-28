@@ -1,4 +1,4 @@
-﻿using JidamVision.Util;
+﻿using EOI.Util;
 using MvCamCtrl.NET;
 using OpenCvSharp;
 using OpenCvSharp.Dnn;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MvCamCtrl.NET.MyCamera;
 
-namespace JidamVision.Grab
+namespace EOI.Grab
 {
 
     internal class HikRobotCam : GrabModel

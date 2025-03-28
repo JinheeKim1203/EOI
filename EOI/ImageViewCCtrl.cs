@@ -1,6 +1,6 @@
-﻿using JidamVision.Algorithm;
-using JidamVision.Core;
-using JidamVision.Teach;
+﻿using EOI.Algorithm;
+using EOI.Core;
+using EOI.Teach;
 using OpenCvSharp.Dnn;
 using OpenCvSharp.Internal.Vectors;
 using System;
@@ -20,7 +20,7 @@ using System.Web;
 using System.Windows.Forms;
 using static System.Windows.Forms.MonthCalendar;
 
-namespace JidamVision
+namespace EOI
 {
     /*
     #MULTI ROI# - <<<검사에 필요한 다양한 ROI를 추가하고 수정할 수 있도록 기능 수정>>> 
