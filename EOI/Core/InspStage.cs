@@ -375,7 +375,7 @@ namespace EOI.Core
             inspWindow.IsTeach = false;
             SetTeachingImage(inspWindow);
             UpdateProperty(inspWindow);
-            UpdateDiagramEntity();
+            UpdateDiagramEntity(); // 변경된 모델 정보 갱신, 즉 ROI를 추가할 때마다 정보가 반영됨.
 
             CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
@@ -497,7 +497,7 @@ namespace EOI.Core
             MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
             if (matchAlgo != null)
             {
-                matchAlgo.SetTemplateImage(windowImage);
+                matchAlgo.SetTemplateImage(windowImage); // 해당 ROI 영역을 "이미지 템플릿 매칭"을 위한 이미지로 설정.
             }
         }
 

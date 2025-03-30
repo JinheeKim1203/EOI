@@ -30,7 +30,8 @@ namespace EOI
         InspBinary,
         InspMatch,
         InspFilter,
-        InspCount
+        InspCount,
+        PinHeaderCounter, // **추가**
     }
 
     public partial class PropertiesForm : DockContent
@@ -100,6 +101,11 @@ namespace EOI
                     FilterInspProp filterProp = new FilterInspProp();
                     filterProp.FilterSelected += FilterSelect_FilterChanged;
                     _inspProp = filterProp;
+                    break;
+                case InspectType.PinHeaderCounter: // **추가**
+                    PinHeaderCounterProp pinHeaderCounterProp = new PinHeaderCounterProp();
+                    pinHeaderCounterProp.PropertyChanged += PropertyChanged;
+                    _inspProp = pinHeaderCounterProp;
                     break;
                 default:
                     MessageBox.Show("유효하지 않은 옵션입니다.");

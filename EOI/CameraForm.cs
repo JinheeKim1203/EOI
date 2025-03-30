@@ -47,10 +47,10 @@ namespace EOI
                     Global.Inst.InspStage.TryInspection(e.InspWindow);
                     break;
                 case EntityActionType.Add:
-                    Global.Inst.InspStage.AddInspWindow(e.WindowType, e.Rect);
+                    Global.Inst.InspStage.AddInspWindow(e.WindowType, e.Rect); // ROI 추가(여기서 ROI의 타입, 해당 ROI에 적용되는 알고리즘 수정 가능)
                     break;
                 case EntityActionType.Move:
-                    Global.Inst.InspStage.MoveInspWindow(e.InspWindow, e.OffsetMove);
+                    Global.Inst.InspStage.MoveInspWindow(e.InspWindow, e.OffsetMove); // ROI 이동
                     break;
                 case EntityActionType.Resize:
                     Global.Inst.InspStage.ModifyInspWindow(e.InspWindow, e.Rect);
@@ -97,7 +97,7 @@ namespace EOI
             return eImageChannel.Color;
         }
 
-        public void UpdateDisplay(Bitmap bitmap = null)
+        public void UpdateDisplay(Bitmap bitmap = null) // 이 부분이 오류가 난다면 참조에서 System.Drawing.Common을 제거하면 됨. System.Drawing이랑 충돌나서 그럼.
         {
             if (bitmap == null)
             {

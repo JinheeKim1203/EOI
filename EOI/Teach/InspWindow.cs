@@ -115,6 +115,9 @@ namespace EOI.Teach
                 case InspectType.InspMatch:
                     inspAlgo = new MatchAlgorithm();
                     break;
+                case InspectType.PinHeaderCounter: // **추가**
+                    inspAlgo = new PinHeaderCounter();
+                    break;
             }
 
             if (inspAlgo is null)

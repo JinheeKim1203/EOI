@@ -43,7 +43,7 @@ namespace EOI.Teach
         public InspWindow AddInspWindow(InspWindowType windowType)
         {
             InspWindow inspWindow = InspWindowFactory.Inst.Create(windowType);
-            InspWindowList.Add(inspWindow);
+            InspWindowList.Add(inspWindow); // 해당 ROI를 내가 그린 ROI 리스트에 추가.
 
             return inspWindow;
         }

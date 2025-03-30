@@ -107,7 +107,7 @@ namespace EOI.Inspect
             {
                 //모든 윈도우에 오프셋 반영
                 window.SetInspOffset(alignOffset);
-                if (!InspectWindow(window))
+                if (!InspectWindow(window)) // 여기에 DoInspect()함수가 호출되어 알고리즘 검사가 적용됨.
                     return false;
             }
 

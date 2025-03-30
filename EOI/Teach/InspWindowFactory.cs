@@ -31,30 +31,30 @@ namespace EOI.Teach
         public InspWindow Create(InspWindowType windowType)
         {
             string name, prefix;
-            if (!GetWindowName(windowType, out name, out prefix))
+            if (!GetWindowName(windowType, out name, out prefix)) // InspWindowType이 없다면.
                 return null;
 
             InspWindow inspWindow = null;
 
-            if(InspWindowType.Group == windowType)
-                inspWindow = new GroupWindow(name);
+            if(InspWindowType.Group == windowType) // InspWindowType이 Group이라면.
+                inspWindow = new GroupWindow(name); 
             else
                 inspWindow = new InspWindow(windowType,name);
 
             if(inspWindow is null) 
                 return null;
 
-            if(!_windowTypeNo.ContainsKey(name))
+            if(!_windowTypeNo.ContainsKey(name)) 
                 _windowTypeNo[name] = 0;
 
             int curID = _windowTypeNo[name];
-            curID++;
+            curID++; // 해당 ROI(InspWindow)의 개수가 증가.
 
-            inspWindow.UID = string.Format("{0}_{1:D6}", prefix, curID);
+            inspWindow.UID = string.Format("{0}_{1:D6}", prefix, curID); // 모델트리창에 쓰여짐.
 
             _windowTypeNo[name] = curID;
 
-            AddInspAlgorithm(inspWindow);
+            AddInspAlgorithm(inspWindow); // 해당 InspWindowType(ROI)에 알고리즘을 추가.
 
             return inspWindow;
         }
@@ -88,7 +88,8 @@ namespace EOI.Teach
                     break;
                 case InspWindowType.Pad:
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
-                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    //inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    inspWindow.AddInspAlgorithm(InspectType.PinHeaderCounter); //**추가** 이걸로 함
                     break;
             }
 

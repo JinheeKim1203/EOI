@@ -14,7 +14,7 @@ using System.Windows.Forms;
 using static System.Windows.Forms.MonthCalendar;
 
 namespace EOI.Property
-{
+{   
     /*
     #BINARY FILTER# - <<<이진화 검사 개발>>> 
     입력된 lower, upper 임계값을 이용해, 영상을 이진화한 후, Filter(area)등을 이용해, 원하는 영역을 찾는다.
@@ -25,7 +25,8 @@ namespace EOI.Property
     {
         ShowBinaryNone = 0,             //이진화 하이라이트 끄기
         ShowBinaryHighlight,            //이진화 하이라이트 보기
-        ShowBinaryOnly                  //배경 없이 이진화 이미지만 보기
+        ShowBinaryOnly,                 //배경 없이 이진화 이미지만 보기
+        //ShowDeNoise                     // **추가** 노이즈 제거된 이진화 이미지 보기
     }
 
     public partial class BinaryInspProp : UserControl
@@ -64,6 +65,8 @@ namespace EOI.Property
             txtHeightMin.Leave += OnFilterChanged;
             txtHeightMax.Leave += OnFilterChanged;
 
+            //txtIteration.Leave += OnFilterChanged; // **추가**
+
             txtCount.Leave += OnFilterChanged;
 
             trackBarLower.Value = 0;
@@ -93,6 +96,7 @@ namespace EOI.Property
             txtHeightMin.Text = _blobAlgo.HeightMin.ToString();
             txtHeightMax.Text = _blobAlgo.HeightMax.ToString();
             txtCount.Text = _blobAlgo.BlobCount.ToString();
+            //txtIteration.Text = _blobAlgo.BlobCount.ToString();
         }
 
         public void GetProperty()
@@ -145,6 +149,12 @@ namespace EOI.Property
                 int blobCount = int.Parse(txtCount.Text);
                 _blobAlgo.BlobCount = blobCount;
             }
+            //// **추가**
+            //if (txtIteration.Text != "")
+            //{
+            //    int iteration = int.Parse(txtIteration.Text);
+            //    _blobAlgo.IterationsNum = iteration;
+            //}
         }
 
         //#BINARY FILTER#10 이진화 옵션을 선택할때마다, 이진화 이미지가 갱신되도록 하는 함수
@@ -154,6 +164,7 @@ namespace EOI.Property
 
             bool invert = chkInvert.Checked;
             bool highlight = chkHighlight.Checked;
+            bool showDeNoise = chkShowDeNoise.Checked; // **추가**
 
             ShowBinaryMode showBinaryMode = ShowBinaryMode.ShowBinaryNone;
             if (highlight)
@@ -163,9 +174,14 @@ namespace EOI.Property
                 bool showBinary = chkShowBinary.Checked;
 
                 if (showBinary)
+                {
                     showBinaryMode = ShowBinaryMode.ShowBinaryOnly;
-            }
 
+                    //showBinary = chkShowBinary.Checked; // **추가**
+                    //if (showDeNoise) // **추가**
+                    //    showBinaryMode = ShowBinaryMode.ShowDeNoise;
+                }
+            }
             RangeChanged?.Invoke(this, new RangeChangedEventArgs(LowerValue, UpperValue, invert, showBinaryMode));
         }
 
@@ -186,6 +202,12 @@ namespace EOI.Property
         }
 
         private void chkHighlight_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateBinary();
+        }
+
+        // **추가**
+        private void chkDeNoiseOnly_CheckedChanged(object sender, EventArgs e)
         {
             UpdateBinary();
         }
@@ -260,7 +282,7 @@ namespace EOI.Property
                 MessageBox.Show("숫자만 입력 가능합니다.");
                 txtHeightMax.Text = _blobAlgo.HeightMax.ToString(); // 기존 값 복원
             }
-        }
+        }       
     }
 
     //#BINARY FILTER#9 이진화 관련 이벤트 발생시, 전달할 값 추가

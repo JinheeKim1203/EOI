@@ -3,6 +3,8 @@ using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Data.Linq;
+using System.Threading;
 
 namespace EOI.Algorithm
 {
@@ -36,6 +38,8 @@ namespace EOI.Algorithm
         public int BlobCount { get; set; } = 0;
         public int OutBlobCount { get; set; } = 0;
 
+        public int IterationsNum { get; set; } = 1;
+
         public BlobAlgorithm()
         {
             //#ABSTRACT ALGORITHM#5 각 함수마다 자신의 알고리즘 타입 설정
@@ -66,6 +70,18 @@ namespace EOI.Algorithm
             Mat binaryImage = new Mat();
             //Cv2.Threshold(grayImage, binaryMask, lowerValue, upperValue, ThresholdTypes.Binary);
             Cv2.InRange(grayImage, BinThreshold.lower, BinThreshold.upper, binaryImage);
+
+            #region 2025.03.30 노이즈 제거 및 정확한 윤곽선 검출을 위한 모폴로지 연산 추가 (CHB)                        
+            // *****************정확도 매우 낮음*****************
+            // 모폴로지 커널
+            Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
+
+            // 노이즈 제거 (열림 연산)
+            Cv2.MorphologyEx(grayImage, grayImage, MorphTypes.Open, kernel, iterations: 2); // 여기서 조정
+
+            // 구멍 메우기 (닫힘 연산)
+            Cv2.MorphologyEx(grayImage, grayImage, MorphTypes.Close, kernel, iterations: 2);
+            #endregion
 
             if (BinThreshold.invert)
                 binaryImage = ~binaryImage;
@@ -134,7 +150,7 @@ namespace EOI.Algorithm
                 Rect blobRect = boundingRect + InspRect.TopLeft;
 
                 string blobInfo;
-                blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, Size({blobRect.Width},{blobRect.Height})";
+                blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, Size({blobRect.Width},{blobRect.Height})"; //**수정**
                 ResultString.Add(blobInfo);
 
                 _findArea.Add(blobRect);

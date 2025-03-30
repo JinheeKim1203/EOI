@@ -146,9 +146,9 @@ namespace EOI.Inspect
             }
             else
             {
-                RunInspect();
+                RunInspect(); // 해당 InspWindow(ROI)에 적용된 모든 알고리즘을 검사.
             }
-
+            // 결과창에 검사 결과 출력.
             ResultForm resultForm = MainForm.GetDockForm<ResultForm>();
             if (resultForm != null)
             {
@@ -165,6 +165,7 @@ namespace EOI.Inspect
         }
 
         //#INSP WORKER#3 각 알고리즘 타입 별로 검사에 필요한 데이터를 입력하는 함수
+        // 여기에 내가 필요한 알고리즘을 switch문 안에 추가하면 됨.
         private bool UpdateInspData(InspWindow inspWindow)
         {
             if (inspWindow is null)
@@ -180,7 +181,7 @@ namespace EOI.Inspect
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
 
-                InspectType inspType = inspAlgo.InspectType;
+                InspectType inspType = inspAlgo.InspectType; // InspectType에 본인이 만든 알고리즘이 있다면 추가하기
 
                 switch (inspType)
                 {
@@ -199,6 +200,14 @@ namespace EOI.Inspect
 
                             Mat srcImage = Global.Inst.InspStage.GetMat(0, matchAlgo.ImageChannel);
                             matchAlgo.SetInspData(srcImage);
+                            break;
+                        }
+                    case InspectType.PinHeaderCounter: // **추가**
+                        {
+                            PinHeaderCounter pinHeaderCounter = (PinHeaderCounter)inspAlgo;
+
+                            Mat srcImage = Global.Inst.InspStage.GetMat(0, pinHeaderCounter.ImageChannel);
+                            pinHeaderCounter.SetInspData(srcImage);
                             break;
                         }
                     default:
