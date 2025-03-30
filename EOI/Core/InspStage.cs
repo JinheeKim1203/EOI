@@ -539,6 +539,26 @@ namespace EOI.Core
                 return false;
             }
 
+            // jh ⛳ 여기에서 Parent / LinkedWindow 복원
+            foreach (var window in _model.InspWindowList)
+            {
+                if (window is GroupWindow group)
+                {
+                    foreach (var child in group.Members)
+                    {
+                        child.Parent = group;
+                    }
+                }
+
+                foreach (var algo in window.AlgorithmList)
+                {
+                    if (algo is MatchAlgorithm matchAlgo)
+                    {
+                        matchAlgo.LinkedWindow = window;
+                    }
+                }
+            }
+
             string inspImagePath = _model.InspectImagePath;
             if (File.Exists(inspImagePath))
             {

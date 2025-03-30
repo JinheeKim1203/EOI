@@ -44,9 +44,12 @@ namespace EOI.Teach
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
 
         //부모-자식 관계를 위한 변수 추가
+
+        [XmlIgnore] 
         public InspWindow Parent { get; set; }
 
         [XmlElement("ChildWindow")]
+        [XmlIgnore]
         public List<InspWindow> Children { get; set; } = new List<InspWindow>();
 
         public List<InspResult> InspResultList { get; set; } = new List<InspResult>();
@@ -119,6 +122,12 @@ namespace EOI.Teach
 
             if (inspAlgo is null)
                 return false;
+
+            // jh ⛳ MatchAlgorithm이면 LinkedWindow 설정
+            if (inspAlgo is MatchAlgorithm matchAlgo)
+            {
+                matchAlgo.LinkedWindow = this;
+            }
 
             AlgorithmList.Add(inspAlgo);
 

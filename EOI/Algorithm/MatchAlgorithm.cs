@@ -11,6 +11,7 @@ using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace EOI.Algorithm
 {
@@ -37,6 +38,10 @@ namespace EOI.Algorithm
         public int MatchCount { get; set; } = 1;
 
         private int _scanStep = 8; // 검색 간격 (SCAN 값)
+
+        // jh
+        [XmlIgnore]
+        public InspWindow LinkedWindow { get; set; }
 
         public MatchAlgorithm()
         {
@@ -186,6 +191,60 @@ namespace EOI.Algorithm
             return matchedPositions.Count;
         }
 
+        public bool MatchTemplateBestFromFiles(string uid, Mat image, Point leftTopPos)
+        {
+            string modelDir = Path.GetDirectoryName(Global.Inst.InspStage.CurModel.ModelPath);
+            string imageDir = Path.Combine(modelDir, "Images");
+
+            SLogger.Write($"[MatchTemplateBestFromFiles] imageDir = {imageDir}");
+
+            var templatePaths = Directory.GetFiles(imageDir, $"{uid}_T*.png");
+            SLogger.Write($"[MatchTemplateBestFromFiles] Found {templatePaths.Length} templates for {uid}");
+            if (templatePaths.Length == 0)
+                return false;
+
+            double bestScore = -1;
+            Point bestPoint = new Point();
+            Mat bestTemplate = null;
+
+            foreach (var path in templatePaths)
+            {
+                SLogger.Write($"[MatchTemplateBestFromFiles] Try loading: {path}");
+                Mat template = Cv2.ImRead(path, ImreadModes.Grayscale);
+                if (template.Empty())
+                {
+                    SLogger.Write($"[MatchTemplateBestFromFiles] ❌ Failed to load: {path}");
+                    continue;
+                }
+                Mat result = new Mat();
+                Cv2.MatchTemplate(image, template, result, TemplateMatchModes.CCoeffNormed);
+                Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out Point maxLoc);
+
+                if (maxVal > bestScore)
+                {
+                    bestScore = maxVal;
+                    bestPoint = maxLoc;
+                    bestTemplate = template;
+                }
+            }
+
+            if (bestTemplate == null)
+            {
+                SLogger.Write("[MatchTemplateBestFromFiles] ❌ No valid template selected.");
+                return false;
+            }
+            // 최종 결과 설정
+            OutScore = (int)(bestScore * 100);
+            OutPoint = bestPoint + leftTopPos;
+            OutPoints.Clear();
+            OutPoints.Add(OutPoint);
+            _templateImage = bestTemplate;
+
+            SLogger.Write($"Best template matched. Score={bestScore:F2}, Location={OutPoint}");
+
+            return true;
+        }
+
         //#ABSTRACT ALGORITHM#3 매칭 알고리즘 검사 구현
         public override bool DoInspect()
         {
@@ -194,18 +253,6 @@ namespace EOI.Algorithm
             OutPoint = new Point(0, 0);
             OutPoints.Clear();
             MatchScore = 0;
-
-            if (_templateImage is null)
-            {
-                MessageBox.Show("티칭 이미지는 유효하지 않습니다!");
-                return false;
-            }
-
-            if (_templateImage.Type() == MatType.CV_8UC3)
-            {
-                MessageBox.Show("티칭 이미지는 칼라를 허용하지 않습니다!");
-                return false;
-            }
 
             Mat srcImage = Global.Inst.InspStage.GetMat(0, ImageChannel);
 
@@ -219,16 +266,38 @@ namespace EOI.Algorithm
 
             Mat targetImage = srcImage[ExtArea];
 
+            if (MatchCount == 1)
+            {
+                // jh ✅ MatchCount == 1일 때는 템플릿 이미지 검사 생략하고 바로 다중 템플릿 로딩
+                if (LinkedWindow == null || !MatchTemplateBestFromFiles(LinkedWindow.UID, targetImage, ExtArea.TopLeft))
+                {
+                    MessageBox.Show("템플릿 매칭에 실패했습니다!");
+                    return false;
+                }
+            }
+            else
+            {
+                if (_templateImage == null)
+                {
+                    MessageBox.Show("티칭 이미지는 유효하지 않습니다!");
+                    return false;
+                }
+
+                if (_templateImage.Type() == MatType.CV_8UC3)
+                {
+                    MessageBox.Show("티칭 이미지는 칼라를 허용하지 않습니다!");
+                    return false;
+                }
+            }
+
             int halfWidth = (int)(_templateImage.Width * 0.5f + 0.5f);
             int halfHeight = (int)(_templateImage.Height * 0.5f + 0.5f);
 
             if (MatchCount == 1)
             {
-                if (MatchTemplateSingle(targetImage, ExtArea.TopLeft) == false)
-                    return false;
-
                 OutPoints.Add(OutPoint);
 
+                // jh ⛳ 2. 결과 포인트 보정 및 결과 텍스트 기록
                 Point matchPos = new Point(OutPoint.X + halfWidth, OutPoint.Y + halfHeight);
                 IsDefect = (OutScore >= MatchScore) ? true : false;
                 string defectInfo = IsDefect ? "NG" : "OK";
