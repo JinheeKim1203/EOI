@@ -325,7 +325,7 @@ namespace EOI
         //    }
         //}
         #endregion
-
+        //#HN#
         // Windows Forms에서 컨트롤이 다시 그려질 때 자동으로 호출되는 메서드
         // 화면새로고침(Invalidate()), 창 크기변경, 컨트롤이 숨겨졌다가 나타날때 실행
         protected override void OnPaint(PaintEventArgs e)
@@ -334,39 +334,24 @@ namespace EOI
 
             if (_bitmapImage != null && Canvas != null)
             {
-                // 캔버스를 초기화하고 이미지 그리기
-                using (Graphics g = Graphics.FromImage(Canvas))  // 메모리누수방지
+                using (Graphics g = Graphics.FromImage(Canvas))
                 {
-                    g.Clear(Color.Transparent); // 배경을 투명하게 설정
-
-                    //이미지 확대or축소때 화질 최적화 방식(Interpolation Mode) 설정                    
+                    g.Clear(Color.Transparent);
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
                     g.DrawImage(_bitmapImage, ImageRect);
 
-                    /* Interpolation Mode********************************************
-                     * NearestNeighbor	빠르지만 품질이 낮음 (픽셀이 깨질 수 있음)
-                     * Bicubic	Bilinear보다 더 부드러움, 그러나 속도가 느릴 수 있음
-                     * HighQualityBicubic	가장 부드럽고 고품질, 그러나 가장 느림
-                     * HighQualityBilinear	Bilinear보다 품질이 높고 Bicubic보다 빠름
-                     ****************************************************************/
-
-                    //#MATCH PROP#12 템플릿 매칭 위치 그리기
-
-                    // 이미지 좌표 → 화면 좌표 변환 후 사각형 그리기
-                    if (_rectangles != null)
+                    if (_rectangles != null && _rectangles.Count > 0)
                     {
-                        using (Pen pen = new Pen(Color.LightCoral, 2))
+                        using (Pen resultPen = new Pen(Color.LightCoral, 2))
                         {
                             foreach (var rect in _rectangles)
                             {
                                 Rectangle screenRect = VirtualToScreen(rect);
-                                g.DrawRectangle(pen, screenRect);
+                                g.DrawRectangle(resultPen, screenRect);
                             }
                         }
                     }
 
-                    //#MULTI ROI#8 여러개 ROI를 그려주는 코드
-                    //#GROUP ROI#8 멀티ROI 처리
                     _screenSelectedRect = new Rectangle(0, 0, 0, 0);
                     foreach (DiagramEntity entity in _diagramEntityList)
                     {
@@ -378,29 +363,20 @@ namespace EOI
                                 pen.DashStyle = DashStyle.Dash;
                                 pen.Width = 2;
 
-                                if (_screenSelectedRect.IsEmpty)
-                                {
-                                    _screenSelectedRect = screenRect;
-                                }
-                                else
-                                {
-                                    //선택된 roi가 여러개 일때, 전체 roi 영역 계산
-                                    //선택된 roi 영역 합치기
-                                    _screenSelectedRect = Rectangle.Union(_screenSelectedRect, screenRect);
-                                }
+                                _screenSelectedRect = _screenSelectedRect.IsEmpty
+                                    ? screenRect
+                                    : Rectangle.Union(_screenSelectedRect, screenRect);
                             }
 
                             g.DrawRectangle(pen, screenRect);
                         }
 
-                        //선택된 ROI가 있다면, 리사이즈 핸들 그리기
                         if (_multiSelectedEntities.Count <= 1 && entity == _selEntity)
                         {
-                            // 리사이즈 핸들 그리기 (8개 포인트: 4 모서리 + 4 변 중간)
                             using (Brush brush = new SolidBrush(Color.LightBlue))
                             {
-                                Point[] resizeHandles = GetResizeHandles(screenRect);
-                                foreach (Point handle in resizeHandles)
+                                Point[] handles = GetResizeHandles(screenRect);
+                                foreach (var handle in handles)
                                 {
                                     g.FillRectangle(brush, handle.X - _ResizeHandleSize / 2, handle.Y - _ResizeHandleSize / 2, _ResizeHandleSize, _ResizeHandleSize);
                                 }
@@ -408,7 +384,6 @@ namespace EOI
                         }
                     }
 
-                    //#GROUP ROI#9 선택된 개별 roi가 없고, 여러개가 선택되었다면
                     if (_multiSelectedEntities.Count > 1 && !_screenSelectedRect.IsEmpty)
                     {
                         using (Pen pen = new Pen(Color.White, 2))
@@ -416,18 +391,16 @@ namespace EOI
                             g.DrawRectangle(pen, _screenSelectedRect);
                         }
 
-                        // 리사이즈 핸들 그리기 (8개 포인트: 4 모서리 + 4 변 중간)
                         using (Brush brush = new SolidBrush(Color.LightBlue))
                         {
-                            Point[] resizeHandles = GetResizeHandles(_screenSelectedRect);
-                            foreach (Point handle in resizeHandles)
+                            Point[] handles = GetResizeHandles(_screenSelectedRect);
+                            foreach (var handle in handles)
                             {
                                 g.FillRectangle(brush, handle.X - _ResizeHandleSize / 2, handle.Y - _ResizeHandleSize / 2, _ResizeHandleSize, _ResizeHandleSize);
                             }
                         }
                     }
 
-                    //#MULTI ROI#9 신규 ROI 추가할때, 해당 ROI 그리기
                     if (_isSelectingRoi && !_roiRect.IsEmpty)
                     {
                         Rectangle rect = VirtualToScreen(_roiRect);
@@ -439,11 +412,9 @@ namespace EOI
 
                     if (_multiSelectedEntities.Count <= 1 && _selEntity != null)
                     {
-                        //확장영역이 있다면 표시
                         DrawInspParam(g, _selEntity.LinkedWindow);
                     }
 
-                    //#GROUP ROI#10 선택 영역 박스 그리기
                     if (_isBoxSelecting && !_selectionBox.IsEmpty)
                     {
                         using (Pen pen = new Pen(Color.LightSkyBlue, 3))
@@ -454,7 +425,6 @@ namespace EOI
                         }
                     }
 
-                    // 캔버스를 UserControl 화면에 표시
                     e.Graphics.DrawImage(Canvas, 0, 0);
                 }
             }

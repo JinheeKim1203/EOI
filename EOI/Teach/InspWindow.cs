@@ -33,7 +33,9 @@ namespace EOI.Teach
 
         public Rect WindowArea { get; set; }
         public Rect InspArea { get; set; }
-
+        
+        //#HN#
+        public Rectangle ExpandRect { get; set; }
         public bool IsTeach { get; set; } = false;
 
         //#ABSTRACT ALGORITHM#9 개별 변수로 있던, MatchAlgorithm과 BlobAlgorithm을
@@ -134,7 +136,7 @@ namespace EOI.Teach
 
         //#ABSTRACT ALGORITHM#12 클래스 내에서, 인자로 입력된 타입의 알고리즘을 검사하거나,
         ///모든 알고리즘을 검사하는 옵션을 가지는 검사 함수
-        public virtual bool DoInpsect(InspectType inspType)
+        public virtual bool DoInspect(InspectType inspType)
         {
             foreach (var inspAlgo in AlgorithmList)
             {

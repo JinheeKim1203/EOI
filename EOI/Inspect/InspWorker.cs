@@ -87,7 +87,7 @@ namespace EOI.Inspect
             if (!UpdateInspData(inspWindow))
                 return;
 
-            inspWindow.DoInpsect(InspectType.InspNone);
+            inspWindow.DoInspect(InspectType.InspNone);
         }
 
         public void StartCycleInspectImage()
@@ -107,24 +107,30 @@ namespace EOI.Inspect
                 //Thread.Sleep(200); // 주기 설정
             }
         }
-
+        //#HN#
         //#INSP WORKER#2 InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect()
         {
-            Model curMode = Global.Inst.InspStage.CurModel;
-            List<InspWindow> inspWindowList = curMode.InspWindowList;
-            foreach (var inspWindow in inspWindowList)
+            List<InspWindow> inspWindowList = Global.Inst.InspStage.InspWindowList;
+
+            foreach (InspWindow inspWindow in inspWindowList)
             {
-                if (inspWindow is null)
+                if (inspWindow == null)
                     continue;
 
-                UpdateInspData(inspWindow);
+                List<InspAlgorithm> algorithmList = inspWindow.AlgorithmList;
+                foreach (InspAlgorithm algorithm in algorithmList)
+                {
+                    UpdateInspData(inspWindow);
+                }
             }
 
-            _inspectBoard.InspectWindowList(inspWindowList);
-
-            foreach (var inspWindow in inspWindowList)
+            foreach (InspWindow inspWindow in inspWindowList)
             {
+                if (inspWindow == null)
+                    continue;
+
+                inspWindow.DoInspect(InspectType.InspNone);
                 DisplayResult(inspWindow, InspectType.InspNone);
             }
 
@@ -211,7 +217,7 @@ namespace EOI.Inspect
 
             return true;
         }
-
+        //#HN#
         //#INSP WORKER#4 InspWindow내의 알고리즘 중에서, 인자로 입력된 알고리즘과 같거나,
         //인자가 None이면 모든 알고리즘의 검사 결과(Rect 영역)를 얻어, cameraForm에 출력한다.
         private bool DisplayResult(InspWindow inspObj, InspectType inspType)
@@ -224,7 +230,7 @@ namespace EOI.Inspect
             List<InspAlgorithm> inspAlgorithmList = inspObj.AlgorithmList;
             foreach (var algorithm in inspAlgorithmList)
             {
-                if (algorithm.InspectType != inspType && inspType != InspectType.InspNone)
+                if (algorithm.InspectType != inspType && algorithm.InspectType != InspectType.InspNone)
                     continue;
 
                 List<Rect> resultArea = new List<Rect>();
@@ -237,14 +243,12 @@ namespace EOI.Inspect
 
             if (totalArea.Count > 0)
             {
-                //찾은 위치를 이미지상에서 표시
                 var cameraForm = MainForm.GetDockForm<CameraForm>();
                 if (cameraForm != null)
                 {
                     cameraForm.AddRect(totalArea);
                 }
             }
-
             return true;
         }
     }
