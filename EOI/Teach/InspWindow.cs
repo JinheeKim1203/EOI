@@ -194,6 +194,24 @@ namespace EOI.Teach
         }
         #endregion
 
+        private int GetNextTeachIndex(string folderPath, string uid)
+        {
+            var files = Directory.GetFiles(folderPath, $"{uid}_T*.png");
+            int maxIndex = 0;
+
+            foreach (var file in files)
+            {
+                string name = Path.GetFileNameWithoutExtension(file);
+                var match = System.Text.RegularExpressions.Regex.Match(name, $"{uid}_T(\\d+)");
+                if (match.Success && int.TryParse(match.Groups[1].Value, out int index))
+                {
+                    maxIndex = Math.Max(maxIndex, index);
+                }
+            }
+
+            return maxIndex + 1;
+        }
+
         public virtual bool SaveInspWindow(Model curModel)
         {
             if (curModel is null)
@@ -205,10 +223,12 @@ namespace EOI.Teach
                 Directory.CreateDirectory(imgDir);
             }
 
+            // jh ✅ 여기만 수정! UID_T001, T002... 형식으로 저장되도록
             Mat windowImage = WindowImage;
             if (windowImage != null)
             {
-                string targetPath = Path.Combine(imgDir, UID + ".png");
+                int nextIndex = GetNextTeachIndex(imgDir, UID);
+                string targetPath = Path.Combine(imgDir, $"{UID}_T{nextIndex:D3}.png");
                 Cv2.ImWrite(targetPath, windowImage);
             }
 
