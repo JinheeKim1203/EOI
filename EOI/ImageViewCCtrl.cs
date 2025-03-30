@@ -52,7 +52,7 @@ namespace EOI
     {
         //#MULTI ROI#2 ROI를 추가,수정,삭제 등으로 변경 시, 이벤트 발생
         public event EventHandler<DiagramEntityEventArgs> DiagramEntityEvent;
-
+        //ROI 그리기: 시작점
         private Point _roiStart = Point.Empty;
         private Rectangle _roiRect = Rectangle.Empty;
         private bool _isSelectingRoi = false;
@@ -425,16 +425,16 @@ namespace EOI
                         }
                     }
 
-                    e.Graphics.DrawImage(Canvas, 0, 0);
+                    e.Graphics.DrawImage(Canvas, 0, 0); //rect가 그려지는 코드
                 }
             }
         }
-
+        
         private void DrawInspParam(Graphics g, InspWindow window)
         {
             if (window is null)
                 return;
-
+            //매칭 확장 영역 표시 (MatchAlgorithm 사용)
             MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);
             if (matchAlgo != null)
             {
@@ -574,6 +574,8 @@ namespace EOI
                 //ROI 위치 이동
                 else if (_isMovingRoi)
                 {
+                    //화면 좌표계에서 마우스를 얼마나 이동했는지 계산한 뒤 Virtual 좌표계로 변환
+                    //이 좌표 이동값 (dxVirtual, dyVirtual)이 Align 계산 시 offset 이동량
                     int dx = e.X - _moveStart.X;
                     int dy = e.Y - _moveStart.Y;
 
@@ -681,10 +683,13 @@ namespace EOI
                 {
                     _isMovingRoi = false;
 
+                    //기준 ROI 이동 시 offset 전달됨
                     if (_selEntity != null)
                     {
                         InspWindow linkedWindow = _selEntity.LinkedWindow;
 
+                        //ROI가 얼마나 이동했는지를 계산한 값
+                        //Align 처리 시 기준 ROI의 이동량을 기반으로 다른 ROI들도 동일하게 이동시키는 데 사용
                         Point offsetMove = new Point(0, 0);
                         if (linkedWindow != null)
                         {
@@ -695,6 +700,8 @@ namespace EOI
                         //모델에 InspWindow 이동 이벤트 발생
                         if (offsetMove.X != 0 || offsetMove.Y != 0)
                             DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove));
+                        // 여기서 offsetMove를 통해 기준 ROI가 얼마나 이동했는지를 외부로 이벤트로 전달
+
                         else
                             //모델에 InspWindow 선택 변경 이벤트 발생
                             DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow));
