@@ -34,6 +34,9 @@ namespace EOI.Teach
         public Rect WindowArea { get; set; }
         public Rect InspArea { get; set; }
 
+        //  jh : ✅ 다중 티칭을 위한 ROI 리스트 (WindowArea 외에 추가 crop 영역들)
+        [XmlIgnore]
+        public List<Rect> LearnAreaList { get; set; } = new List<Rect>();
         public bool IsTeach { get; set; } = false;
 
         //#ABSTRACT ALGORITHM#9 개별 변수로 있던, MatchAlgorithm과 BlobAlgorithm을
@@ -113,7 +116,9 @@ namespace EOI.Teach
                     inspAlgo = new BlobAlgorithm();
                     break;
                 case InspectType.InspMatch:
-                    inspAlgo = new MatchAlgorithm();
+                    var match = new MatchAlgorithm();
+                    match.OwnerWindow = this; // ✅ 여기에 추가!
+                    inspAlgo = match;
                     break;
             }
 
@@ -194,58 +199,71 @@ namespace EOI.Teach
         }
         #endregion
 
+        // **jh : 티칭 이미지 저장 방식 변경
         public virtual bool SaveInspWindow(Model curModel)
         {
             if (curModel is null)
                 return false;
 
             string imgDir = Path.Combine(Path.GetDirectoryName(curModel.ModelPath), "Images");
-            if (!Directory.Exists(imgDir))
+            string templateDir = Path.Combine(imgDir, UID); //  **jh : ✅ UID별 폴더 생성
+
+            if (!Directory.Exists(templateDir))
             {
-                Directory.CreateDirectory(imgDir);
+                Directory.CreateDirectory(templateDir);
             }
 
-            Mat windowImage = WindowImage;
-            if (windowImage != null)
+            foreach (InspAlgorithm algo in AlgorithmList)
             {
-                string targetPath = Path.Combine(imgDir, UID + ".png");
-                Cv2.ImWrite(targetPath, windowImage);
+                if (algo is MatchAlgorithm matchAlgo)
+                {
+                    var templates = matchAlgo.GetTemplateImages();
+                    for (int i = 0; i < templates.Count; i++)
+                    {
+                        string savePath = Path.Combine(templateDir, $"T{i + 1:D3}.png");
+                        Cv2.ImWrite(savePath, templates[i]);
+                    }
+                }
             }
 
             return true;
         }
 
+       // *jh : 해당 폴더의 이미지들을 전부 읽어서 MatchAlgorithm.TemplateList에 넣기
         public virtual bool LoadInspWindow(Model curModel)
         {
             if (curModel is null)
                 return false;
 
             string imgDir = Path.Combine(Path.GetDirectoryName(curModel.ModelPath), "Images");
+            string templateDir = Path.Combine(imgDir, UID); // ✅ UID 폴더
 
             foreach (InspAlgorithm algo in AlgorithmList)
             {
-                if (algo is null)
-                    continue;
-
-                if (algo.InspectType == InspectType.InspMatch)
+                if (algo is MatchAlgorithm matchAlgo)
                 {
-                    MatchAlgorithm matchAlgo = algo as MatchAlgorithm;
-                    string targetPath = Path.Combine(imgDir, UID + ".png");
-                    if (File.Exists(targetPath))
+                    List<Mat> templateList = new List<Mat>();
+
+                    if (Directory.Exists(templateDir))
                     {
-                        Mat windowImage = Cv2.ImRead(targetPath);
-                        if (windowImage != null)
+                        var imageFiles = Directory.GetFiles(templateDir, "T*.png").OrderBy(f => f).ToList();
+
+                        foreach (string file in imageFiles)
                         {
-                            WindowImage = windowImage;
-
-                            Mat tempImage = new Mat();
-                            if (windowImage.Type() == MatType.CV_8UC3)
-                                Cv2.CvtColor(windowImage, tempImage, ColorConversionCodes.BGR2GRAY);
-                            else
-                                tempImage = windowImage;
-
-                            matchAlgo.SetTemplateImage(tempImage);
+                            Mat image = Cv2.ImRead(file, ImreadModes.Grayscale);
+                            if (image != null && !image.Empty())
+                            {
+                                templateList.Add(image);
+                            }
                         }
+
+                        matchAlgo.SetTemplateImages(templateList);
+                    }
+
+                    // ✅ WindowImage는 첫 번째 템플릿 이미지로 설정 (기존 호환용)
+                    if (templateList.Count > 0)
+                    {
+                        WindowImage = templateList[0].Clone();
                     }
                 }
             }

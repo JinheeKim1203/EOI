@@ -478,6 +478,7 @@ namespace EOI.Core
             propertiesForm.UpdateProperty(inspWindow);
         }
 
+        //** jh : 다중 티칭 이미지 지원
         public void SetTeachingImage(InspWindow inspWindow)
         {
             if (inspWindow is null)
@@ -491,13 +492,31 @@ namespace EOI.Core
             if (curImage is null)
                 return;
 
-            Mat windowImage = curImage[inspWindow.WindowArea];
+            // ✅ 대표 WindowArea crop
+            Mat windowImage = new Mat(curImage, inspWindow.WindowArea);
             inspWindow.WindowImage = windowImage;
 
             MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
             if (matchAlgo != null)
             {
-                matchAlgo.SetTemplateImage(windowImage);
+                // ✅ 1. 대표 WindowArea도 포함된 LearnAreaList 만들기
+                List<Rect> learnAreas = new List<Rect> { inspWindow.WindowArea };
+                learnAreas.AddRange(inspWindow.LearnAreaList);  // 나머지 추가 영역들
+
+                // ✅ 2. 영역마다 crop
+                List<Mat> templateList = new List<Mat>();
+                foreach (Rect r in learnAreas)
+                {
+                    if (r.Width > 0 && r.Height > 0 &&
+                        r.X >= 0 && r.Y >= 0 &&
+                        r.Right <= curImage.Width && r.Bottom <= curImage.Height)
+                    {
+                        templateList.Add(new Mat(curImage, r).Clone());  // crop & clone!
+                    }
+                }
+
+                // ✅ 3. 템플릿 적용
+                matchAlgo.SetTemplateImages(templateList);
             }
         }
 

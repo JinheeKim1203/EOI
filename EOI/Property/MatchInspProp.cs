@@ -30,6 +30,7 @@ namespace EOI.Property
 
         MatchAlgorithm _matchAlgo = null;
 
+
         public MatchInspProp()
         {
             InitializeComponent();
@@ -38,7 +39,14 @@ namespace EOI.Property
             txtExtendY.Leave += OnUpdateValue;
             txtScore.Leave += OnUpdateValue;
             txtMatchCount.Leave += OnUpdateValue;
+
+            // **jh : 티칭 이미지 리스트
+            this.flwTeachList.AutoScroll = true;
+            this.flwTeachList.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight;
+            this.flwTeachList.WrapContents = false;
         }
+
+
 
         public void SetAlgorithm(MatchAlgorithm matchAlgo)
         {
@@ -60,12 +68,69 @@ namespace EOI.Property
             txtScore.Text = matchScore.ToString();
             txtMatchCount.Text = matchCount.ToString();
 
+            RefreshTeachImageList();  // ← **jh : 리스트 초기화
+
             Mat teachImage = _matchAlgo.GetTemplateImage();
-            if (teachImage != null)
+            if (teachImage != null && !teachImage.Empty())
             {
                 Bitmap bmpImage = BitmapConverter.ToBitmap(teachImage);
                 picTeachImage.Image = bmpImage;
             }
+        }
+
+        //**jh : 티칭 이미지 리스트 갱신
+        private void RefreshTeachImageList()
+        {
+            flwTeachList.Controls.Clear();
+
+            List<Mat> templates = _matchAlgo.GetTemplateImages();
+            if (templates == null || templates.Count == 0)
+                return;
+
+            for (int i = 0; i < templates.Count; i++)
+            {
+                int capturedIndex = i;  // ✅ 이걸로 대체
+
+                PictureBox pic = new PictureBox();
+                pic.Width = 60;
+                pic.Height = 60;
+                pic.SizeMode = PictureBoxSizeMode.Zoom;
+                pic.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(templates[i]);
+                pic.BorderStyle = BorderStyle.FixedSingle;
+                pic.Margin = new Padding(3);
+
+                // 클릭 시 대표 이미지로
+                pic.Click += (s, e) =>
+                {
+                    picTeachImage.Image = pic.Image;
+                };
+
+                // 우클릭 시 삭제
+                pic.MouseDown += (s, e) =>
+                {
+                    if (e.Button == MouseButtons.Right)
+                    {
+                        var result = MessageBox.Show("이 티칭 이미지를 삭제할까요?", "삭제 확인", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.Yes)
+                        {
+                            templates.RemoveAt(capturedIndex);  // ✅ capturedIndex 사용
+                            _matchAlgo.SetTemplateImages(templates); // 템플릿 갱신
+
+                            // ✅ 디스크도 동기화
+                            Define.SaveTemplateImages(_matchAlgo.OwnerWindow?.UID, templates);
+
+                            RefreshTeachImageList();                 // 다시 그리기
+                            PropertyChanged?.Invoke(this, null);     // 변경 알림
+                        }
+                    }
+                };
+
+                flwTeachList.Controls.Add(pic);
+            }
+
+            // 대표 이미지 초기화
+            if (templates.Count > 0)
+                picTeachImage.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(templates[0]);
         }
 
         private void OnUpdateValue(object sender, EventArgs e)
@@ -108,5 +173,7 @@ namespace EOI.Property
 
             PropertyChanged?.Invoke(this, null);
         }
+
+
     }
 }

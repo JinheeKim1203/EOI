@@ -43,12 +43,14 @@
             this.txtExtendX = new System.Windows.Forms.TextBox();
             this.lbX = new System.Windows.Forms.Label();
             this.lbExtent = new System.Windows.Forms.Label();
+            this.flwTeachList = new System.Windows.Forms.FlowLayoutPanel();
             this.grpMatch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTeachImage)).BeginInit();
             this.SuspendLayout();
             // 
             // grpMatch
             // 
+            this.grpMatch.Controls.Add(this.flwTeachList);
             this.grpMatch.Controls.Add(this.picTeachImage);
             this.grpMatch.Controls.Add(this.txtMatchCount);
             this.grpMatch.Controls.Add(this.lbMatchCount);
@@ -138,6 +140,13 @@
             this.lbExtent.TabIndex = 0;
             this.lbExtent.Text = "확장영역";
             // 
+            // flwTeachList
+            // 
+            this.flwTeachList.Location = new System.Drawing.Point(183, 113);
+            this.flwTeachList.Name = "flwTeachList";
+            this.flwTeachList.Size = new System.Drawing.Size(107, 144);
+            this.flwTeachList.TabIndex = 1;
+            // 
             // MatchInspProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -164,5 +173,6 @@
         private System.Windows.Forms.TextBox txtMatchCount;
         private System.Windows.Forms.Label lbMatchCount;
         private System.Windows.Forms.PictureBox picTeachImage;
+        private System.Windows.Forms.FlowLayoutPanel flwTeachList;
     }
 }

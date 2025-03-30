@@ -21,6 +21,9 @@ namespace EOI.Algorithm
         //템플릿 매칭용 이미지(찾을 이미지)
         private Mat _templateImage = null;
 
+        // **jh : ✅ 다중 템플릿 이미지 리스트 추가 (멀티 티칭용)
+        private List<Mat> _templateList = new List<Mat>();
+
         //찾을 이미지의 매칭율
         public int MatchScore { get; set; } = 60;
         //입력된 이미지에서 실제로 검색할 영역 설정, 속도 향상을 위해,
@@ -36,7 +39,9 @@ namespace EOI.Algorithm
         //템플릿 매칭으로 찾고 싶은 갯수
         public int MatchCount { get; set; } = 1;
 
-        private int _scanStep = 8; // 검색 간격 (SCAN 값)
+        private int _scanStep = 4; // 검색 간격 (SCAN 값)
+
+        public InspWindow OwnerWindow { get; set; }
 
         public MatchAlgorithm()
         {
@@ -49,9 +54,27 @@ namespace EOI.Algorithm
             _templateImage = templateImage;
         }
 
+        /// **jh : 외부에서 여러 개의 템플릿 이미지를 설정할 때 사용
+        public void SetTemplateImages(List<Mat> templates)
+        {
+            _templateList = templates;
+        }
+
         public Mat GetTemplateImage()
         {
             return _templateImage;
+        }
+
+        /// **jh : 설정된 템플릿 이미지 리스트를 반환
+        public List<Mat> GetTemplateImages()
+        {
+            return _templateList;
+        }
+
+        /// **jh : 템플릿 이미지 리스트를 초기화 (티칭 이미지 전체 제거)
+        public void ClearTemplateImages()
+        {
+            _templateList.Clear();
         }
 
         /// <summary>
@@ -186,17 +209,17 @@ namespace EOI.Algorithm
             return matchedPositions.Count;
         }
 
-        // ✅ 여러 템플릿 중 최적 single 찾기
-        public bool MatchTemplateBestSingle(Mat image, Point leftTopPos, List<Mat> templateList)
+        // **jh : ✅ 여러 템플릿 중에서 가장 최적의 단일 매칭 위치를 찾는다/
+        public bool MatchTemplateBestSingle(Mat image, Point leftTopPos)
         {
-            if (templateList == null || templateList.Count == 0)
+            if (_templateList == null || _templateList.Count == 0)
                 return false;
 
             Mat bestTemplate = null;
             int bestScore = MatchScore;
             Point bestPoint = new Point(0, 0);
 
-            foreach (var template in templateList)
+            foreach (var template in _templateList)
             {
                 SetTemplateImage(template);
                 if (MatchTemplateSingle(image, leftTopPos))  // ← 개선된 버전 호출
@@ -204,7 +227,7 @@ namespace EOI.Algorithm
                     if (OutScore > bestScore)
                     {
                         bestScore = OutScore;
-                        bestTemplate = template.Clone();
+                        bestTemplate = template.Clone(); // **jh : 가장 점수가 높은 템플릿 보관
                         bestPoint = OutPoint;
                     }
                 }
@@ -221,19 +244,20 @@ namespace EOI.Algorithm
             return false;
         }
 
-        public int MatchTemplateBestMultiple(Mat image, Point leftTopPos, List<Mat> templateList, out List<Point> matchedPoints)
+        // **jh : ✅ 여러 템플릿으로 매칭 수행하여, 임계값 이상인 모든 위치를 찾는다
+        public int MatchTemplateBestMultiple(Mat image, Point leftTopPos, out List<Point> matchedPoints)
         {
             matchedPoints = new List<Point>();
-            if (templateList == null || templateList.Count == 0)
+            if (_templateList == null || _templateList.Count == 0)
                 return 0;
 
             List<Point> allMatches = new List<Point>();
 
-            foreach (var template in templateList)
+            foreach (var template in _templateList)
             {
                 SetTemplateImage(template);
                 if (MatchTemplateMultiple(image, leftTopPos, out List<Point> points) > 0)
-                    allMatches.AddRange(points);
+                    allMatches.AddRange(points); // **jh : 모든 매칭 포인트를 누적
             }
 
             OutPoints = allMatches;
@@ -249,9 +273,10 @@ namespace EOI.Algorithm
             OutPoints.Clear();
             MatchScore = 0;
 
-            if (_templateImage is null)
+            // ** jh : ✅ 유효성 검사
+            if (_templateList == null || _templateList.Count == 0)
             {
-                MessageBox.Show("티칭 이미지는 유효하지 않습니다!");
+                MessageBox.Show("유효한 티칭 이미지가 없습니다!");
                 return false;
             }
 
@@ -276,38 +301,34 @@ namespace EOI.Algorithm
             int halfWidth = (int)(_templateImage.Width * 0.5f + 0.5f);
             int halfHeight = (int)(_templateImage.Height * 0.5f + 0.5f);
 
+
+            // **jh : ✅ 매칭 수행
             if (MatchCount == 1)
             {
-                if (MatchTemplateSingle(targetImage, ExtArea.TopLeft) == false)
+                if (!MatchTemplateBestSingle(targetImage, ExtArea.TopLeft))
                     return false;
 
                 OutPoints.Add(OutPoint);
 
                 Point matchPos = new Point(OutPoint.X + halfWidth, OutPoint.Y + halfHeight);
-                IsDefect = (OutScore >= MatchScore) ? true : false;
+                IsDefect = (OutScore >= MatchScore);
                 string defectInfo = IsDefect ? "NG" : "OK";
                 string resultInfo = $"[{defectInfo}] 매칭 결과 : X {matchPos.X}, Y {matchPos.Y}, Score {OutScore}";
                 ResultString.Add(resultInfo);
             }
             else
             {
-                List<Point> outPoints = new List<Point>();
-                int matchCount = MatchTemplateMultiple(targetImage, ExtArea.TopLeft, out outPoints);
-                if (matchCount <= 0)
+                if (MatchTemplateBestMultiple(targetImage, ExtArea.TopLeft, out List<Point> matched) <= 0)
                     return false;
 
-                OutPoints = outPoints;
+                OutPoints = matched;
 
-                string resultInfo;
-                resultInfo = $"[Match Result] match count : {matchCount}";
-                ResultString.Add(resultInfo);
-
-                for (int i = 0; i < matchCount; i++)
+                ResultString.Add($"[Match Result] match count : {matched.Count}");
+                for (int i = 0; i < matched.Count; i++)
                 {
-                    Point pos = outPoints[i];
-                    Point matchPos = new Point(pos.X + halfWidth, pos.Y + halfHeight);
-                    resultInfo = $"[매칭 결과 : X {matchPos.X}, Y {matchPos.Y}";
-                    ResultString.Add(resultInfo);
+                    Point p = matched[i];
+                    Point center = new Point(p.X + halfWidth, p.Y + halfHeight);
+                    ResultString.Add($"[매칭 결과 {i + 1}] X {center.X}, Y {center.Y}");
                 }
             }
 

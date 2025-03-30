@@ -97,6 +97,7 @@ namespace EOI
         //여러개 ROI를 관리하기 위한 리스트
         private List<DiagramEntity> _diagramEntityList = new List<DiagramEntity>();
 
+
         //현재 선택된 ROI 리스트
         private List<DiagramEntity> _multiSelectedEntities = new List<DiagramEntity>();
         private DiagramEntity _selEntity;
