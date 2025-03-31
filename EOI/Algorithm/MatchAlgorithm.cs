@@ -252,7 +252,6 @@ namespace EOI.Algorithm
 
             OutPoint = new Point(0, 0);
             OutPoints.Clear();
-            MatchScore = 0;
 
             Mat srcImage = Global.Inst.InspStage.GetMat(0, ImageChannel);
 
@@ -299,7 +298,7 @@ namespace EOI.Algorithm
 
                 // jh ⛳ 2. 결과 포인트 보정 및 결과 텍스트 기록
                 Point matchPos = new Point(OutPoint.X + halfWidth, OutPoint.Y + halfHeight);
-                IsDefect = (OutScore >= MatchScore) ? true : false;
+                IsDefect = (OutScore < MatchScore) ? true : false;
                 string defectInfo = IsDefect ? "NG" : "OK";
                 string resultInfo = $"[{defectInfo}] 매칭 결과 : X {matchPos.X}, Y {matchPos.Y}, Score {OutScore}";
                 ResultString.Add(resultInfo);

@@ -151,6 +151,13 @@ namespace EOI
             if (curModel is null)
                 return;
 
+            // UI 스레드에서 실행되도록 처리
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => AddModelResult(curModel)));
+                return;
+            }
+
             _treeListView.SetObjects(curModel.InspWindowList);
 
             foreach (var window in curModel.InspWindowList)
@@ -217,6 +224,20 @@ namespace EOI
                 _txtDetails.Text = $"{window.UID}\r\n" +
                     string.Join("\r\n", infos);
             }
+        }
+
+        public void RefreshWindow(InspWindow inspWindow)
+        {
+            if (inspWindow == null)
+                return;
+
+            _treeListView.RefreshObject(inspWindow);
+            foreach (var child in inspWindow.InspResultList)
+            {
+                _treeListView.RefreshObject(child);
+            }
+
+            _treeListView.Expand(inspWindow);
         }
     }
 }

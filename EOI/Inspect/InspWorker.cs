@@ -88,6 +88,19 @@ namespace EOI.Inspect
                 return;
 
             inspWindow.DoInpsect(InspectType.InspNone);
+
+            // **jh ✅ 기존 검사 결과 박스 표시
+            DisplayResult(inspWindow, InspectType.InspNone);
+
+            // ✅ ResultForm 트리뷰에 검사 결과 추가
+            var resultForm = MainForm.GetDockForm<ResultForm>();
+            if (inspWindow.InspResultList != null)
+            {
+                foreach (var result in inspWindow.InspResultList)
+                {
+                    resultForm?.AddInspResult(result);
+                }
+            }
         }
 
         public void StartCycleInspectImage()
@@ -113,6 +126,11 @@ namespace EOI.Inspect
         {
             Model curMode = Global.Inst.InspStage.CurModel;
             List<InspWindow> inspWindowList = curMode.InspWindowList;
+
+            // **jh : 검사 전 결과 트리 초기화 (선택)
+            var resultForm = MainForm.GetDockForm<ResultForm>();
+            resultForm?.AddModelResult(curMode); // 전체 트리 뷰 구조 잡아줌
+
             foreach (var inspWindow in inspWindowList)
             {
                 if (inspWindow is null)
@@ -126,6 +144,16 @@ namespace EOI.Inspect
             foreach (var inspWindow in inspWindowList)
             {
                 DisplayResult(inspWindow, InspectType.InspNone);
+
+                // ✅ 검사 결과 트리뷰에 추가로 표시
+                if (inspWindow.InspResultList != null)
+                {
+                    foreach (var result in inspWindow.InspResultList)
+                    {
+                        // ✅ 트리뷰의 기존 구조 유지하고, 자식 노드만 갱신
+                        resultForm?.RefreshWindow(inspWindow);  // <- 새로 추가할 함수
+                    }
+                }
             }
 
             return true;
