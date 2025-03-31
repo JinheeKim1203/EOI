@@ -23,6 +23,7 @@ namespace EOI.Algorithm
     [XmlInclude(typeof(MatchAlgorithm))]
     [XmlInclude(typeof(BlobAlgorithm))]
     [XmlInclude(typeof(PinHeaderCounter))] // **추가**
+    [XmlInclude(typeof(ICLeadCounter))] // **추가**
     public abstract class InspAlgorithm
     {
         //#ABSTRACT ALGORITHM#1 검사 알고리즘을 추상화하여, 공통된 값이나, 함수 정의

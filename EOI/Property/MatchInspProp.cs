@@ -67,7 +67,7 @@ namespace EOI.Property
                 picTeachImage.Image = bmpImage;
             }
         }
-
+        
         private void OnUpdateValue(object sender, EventArgs e)
         {
             if (_matchAlgo == null)

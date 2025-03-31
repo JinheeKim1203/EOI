@@ -1,4 +1,6 @@
-﻿using OpenCvSharp;
+﻿using EOI.Algorithm;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,29 +15,50 @@ namespace EOI.Property
 {
     public partial class PinHeaderCounterProp : UserControl
     {
-        public event EventHandler<FilterSelectedEventArgs> PropertyChanged;
+        public event EventHandler<EventArgs> PropertyChanged;
+
+        PinHeaderCounter _pinHeaderCounter = null;
         public PinHeaderCounterProp()
         {
             InitializeComponent();           
-            this.picContour.SizeMode = PictureBoxSizeMode.Zoom;
-            this.Controls.Add(this.picContour);
+            //this.picContour.SizeMode = PictureBoxSizeMode.Zoom;
+            //this.Controls.Add(this.picContour);
+            //this.Controls.Add(this.lblStatus);
         }
 
-        public void SetImage(Mat image)
+        public void SetReturnImg(Mat img, string result)
         {
-            if (image == null || image.Empty())
+            Bitmap bmpImage = BitmapConverter.ToBitmap(img);
+            picContour.Image = bmpImage;
+            lblStatus.Text = result;
+        }
+
+
+        public void SetAlgorithm(PinHeaderCounter pinHeaderCounter)
+        {
+            _pinHeaderCounter = pinHeaderCounter;
+            SetProperty();
+        }
+
+        public void SetProperty()
+        {
+            if (_pinHeaderCounter is null)
                 return;
 
-            Bitmap bmp = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
-            picContour.Image = bmp;
+            //lblStatus.Text = _pinHeaderCounter.result;
+
+            Mat pinHeaderImage = _pinHeaderCounter.GetResultImage();
+            if (pinHeaderImage != null)
+            {
+                Bitmap bmpImage = BitmapConverter.ToBitmap(pinHeaderImage);
+                picContour.Image = bmpImage;
+                SetResult();
+            }
         }
 
-        public void ShowDetectedPins(Mat image)
+        public void SetResult()
         {
-            if (image == null || image.Empty()) return;
-
-            Bitmap bitmap = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(image);
-            picContour.Image = bitmap;
+            lblStatus.Text = _pinHeaderCounter.result;
         }
     }
 }

@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\BlobAlgorithm.cs" />
+    <Compile Include="Algorithm\ICLeadCounter.cs" />
     <Compile Include="Algorithm\InspAlgorithm.cs" />
     <Compile Include="Algorithm\MatchAlgorithm.cs" />
     <Compile Include="Algorithm\PinHeaderCounter.cs" />
@@ -191,6 +192,12 @@
     </Compile>
     <Compile Include="Property\FilterInspProp.Designer.cs">
       <DependentUpon>FilterInspProp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Property\ICLeadCounterProp.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Property\ICLeadCounterProp.Designer.cs">
+      <DependentUpon>ICLeadCounterProp.cs</DependentUpon>
     </Compile>
     <Compile Include="Property\MatchInspProp.cs">
       <SubType>UserControl</SubType>

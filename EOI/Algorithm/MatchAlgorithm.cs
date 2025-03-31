@@ -295,7 +295,5 @@ namespace EOI.Algorithm
 
             return resultArea.Count;
         }
-
     }
-
 }

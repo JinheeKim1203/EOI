@@ -30,6 +30,8 @@
         {
             this.picContour = new System.Windows.Forms.PictureBox();
             this.lblContour = new System.Windows.Forms.Label();
+            this.lblPin = new System.Windows.Forms.Label();
+            this.lblStatus = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picContour)).BeginInit();
             this.SuspendLayout();
             // 
@@ -39,7 +41,7 @@
             this.picContour.Location = new System.Drawing.Point(15, 64);
             this.picContour.Name = "picContour";
             this.picContour.Size = new System.Drawing.Size(317, 183);
-            this.picContour.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.picContour.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picContour.TabIndex = 0;
             this.picContour.TabStop = false;
             // 
@@ -53,10 +55,32 @@
             this.lblContour.TabIndex = 1;
             this.lblContour.Text = "윤곽선 감지 이미지";
             // 
+            // lblPin
+            // 
+            this.lblPin.AutoSize = true;
+            this.lblPin.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lblPin.Location = new System.Drawing.Point(11, 264);
+            this.lblPin.Name = "lblPin";
+            this.lblPin.Size = new System.Drawing.Size(154, 20);
+            this.lblPin.TabIndex = 1;
+            this.lblPin.Text = "핀 헤더 상태 : ";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lblStatus.Location = new System.Drawing.Point(162, 264);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(33, 20);
+            this.lblStatus.TabIndex = 1;
+            this.lblStatus.Text = "??";
+            // 
             // PinHeaderCounterProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.lblPin);
             this.Controls.Add(this.lblContour);
             this.Controls.Add(this.picContour);
             this.Name = "PinHeaderCounterProp";
@@ -71,5 +95,7 @@
 
         private System.Windows.Forms.PictureBox picContour;
         private System.Windows.Forms.Label lblContour;
+        private System.Windows.Forms.Label lblPin;
+        private System.Windows.Forms.Label lblStatus;
     }
 }

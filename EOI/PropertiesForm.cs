@@ -32,6 +32,7 @@ namespace EOI
         InspFilter,
         InspCount,
         PinHeaderCounter, // **추가**
+        ICLeadCounter, // **추가**
     }
 
     public partial class PropertiesForm : DockContent
@@ -107,6 +108,11 @@ namespace EOI
                     pinHeaderCounterProp.PropertyChanged += PropertyChanged;
                     _inspProp = pinHeaderCounterProp;
                     break;
+                case InspectType.ICLeadCounter: // **추가**
+                    ICLeadCounterProp icLeadCounterProp = new ICLeadCounterProp();
+                    icLeadCounterProp.PropertyChanged += PropertyChanged;
+                    _inspProp = icLeadCounterProp;
+                    break;
                 default:
                     MessageBox.Show("유효하지 않은 옵션입니다.");
                     return null;
@@ -156,6 +162,22 @@ namespace EOI
 
                         binaryProp.SetAlgorithm(blobAlgo);
                     }
+                    else if (uc is PinHeaderCounterProp pinHeaderCounterProp) // **추가**
+                    {
+                        PinHeaderCounter pinHeaderCounterAlgo = (PinHeaderCounter)window.FindInspAlgorithm(InspectType.PinHeaderCounter);
+                        if (pinHeaderCounterAlgo is null)
+                            continue;
+
+                        pinHeaderCounterProp.SetAlgorithm(pinHeaderCounterAlgo);
+                    }
+                    //else if (uc is ICLeadCounterProp icLeadCounterProp) // **추가**
+                    //{
+                    //    ICLeadCounterAlgorithm icLeadCounterAlgo = (ICLeadCounterAlgorithm)window.FindInspAlgorithm(InspectType.ICLeadCounter);
+                    //    if (icLeadCounterAlgo is null)
+                    //        continue;
+
+                    //    icLeadCounterProp.SetAlgorithm(icLeadCounterAlgo);
+                    //}
                 }
             }
         }

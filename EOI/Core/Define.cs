@@ -26,7 +26,8 @@ namespace EOI.Core
         ID,
         Package,
         Chip,
-        Pad
+        PinHeaderCount, // **추가**
+        ICLeadCount, // **추가**
     }
 
     public static class Define

@@ -43,10 +43,12 @@ namespace EOI.Teach
         [XmlElement("InspAlgorithm")]
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
 
+        [XmlIgnore] // **추가**
         //부모-자식 관계를 위한 변수 추가
         public InspWindow Parent { get; set; }
 
         [XmlElement("ChildWindow")]
+        [XmlIgnore] // **추가**
         public List<InspWindow> Children { get; set; } = new List<InspWindow>();
 
         public List<InspResult> InspResultList { get; set; } = new List<InspResult>();
@@ -117,6 +119,9 @@ namespace EOI.Teach
                     break;
                 case InspectType.PinHeaderCounter: // **추가**
                     inspAlgo = new PinHeaderCounter();
+                    break;
+                case InspectType.ICLeadCounter: // **추가** CHB
+                    inspAlgo = new ICLeadCounter();
                     break;
             }
 

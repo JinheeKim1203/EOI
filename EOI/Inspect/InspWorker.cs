@@ -193,7 +193,6 @@ namespace EOI.Inspect
                             blobAlgo.SetInspData(srcImage);
                             break;
                         }
-
                     case InspectType.InspMatch:
                         {
                             MatchAlgorithm matchAlgo = (MatchAlgorithm)inspAlgo;
@@ -208,6 +207,14 @@ namespace EOI.Inspect
 
                             Mat srcImage = Global.Inst.InspStage.GetMat(0, pinHeaderCounter.ImageChannel);
                             pinHeaderCounter.SetInspData(srcImage);
+                            break;
+                        }
+                    case InspectType.ICLeadCounter: // **추가** CHB
+                        {
+                            ICLeadCounter icLeadCounter = (ICLeadCounter)inspAlgo;
+
+                            Mat srcImage = Global.Inst.InspStage.GetMat(0, icLeadCounter.ImageChannel);
+                            icLeadCounter.SetInspData(srcImage);
                             break;
                         }
                     default:

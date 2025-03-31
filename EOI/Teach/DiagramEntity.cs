@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace EOI.Teach
 {
@@ -11,6 +12,7 @@ namespace EOI.Teach
     public class DiagramEntity
     {
         //ROI 연결된 InspWindow
+        [XmlIgnore] // **추가**
         public InspWindow LinkedWindow { get; set; }
         //ROI 영역정보
         public Rectangle EntityROI { get; set; }

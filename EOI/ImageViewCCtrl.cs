@@ -166,8 +166,11 @@ namespace EOI
                 case InspWindowType.Chip:
                     color = Color.Orange;
                     break;
-                case InspWindowType.Pad:
+                case InspWindowType.PinHeaderCount: // **수정** 2025.03.31 CHB
                     color = Color.Yellow;
+                    break;
+                case InspWindowType.ICLeadCount: // **추가** CHB
+                    color = Color.Red;
                     break;
             }
 

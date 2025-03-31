@@ -86,10 +86,14 @@ namespace EOI.Teach
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     break;
-                case InspWindowType.Pad:
-                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
+                case InspWindowType.PinHeaderCount: //**수정**
+                    //inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     //inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.PinHeaderCounter); //**추가** 이걸로 함
+                    break;
+                case InspWindowType.ICLeadCount:
+                    //inspWindow.AddInspAlgorithm(InspectType.InspMatch);
+                    inspWindow.AddInspAlgorithm(InspectType.ICLeadCounter); //**추가**
                     break;
             }
 
@@ -135,9 +139,13 @@ namespace EOI.Teach
                     name = "Chip";
                     prefix = "CHP";
                     break;
-                case InspWindowType.Pad:
-                    name = "Pad";
-                    prefix = "PAD";
+                case InspWindowType.PinHeaderCount://**추가**
+                    name = "PinHeaderCount";
+                    prefix = "PHC";
+                    break;
+                case InspWindowType.ICLeadCount: //**추가**
+                    name = "ICLeadCount";
+                    prefix = "ICL";
                     break;
                 default:
                     return false;

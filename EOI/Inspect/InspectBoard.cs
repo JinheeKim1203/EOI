@@ -67,6 +67,14 @@ namespace EOI.Inspect
                         BlobAlgorithm blobAlgo = algo as BlobAlgorithm;
                         inspResult.ResultValue = $"{blobAlgo.OutBlobCount}/{blobAlgo.BlobCount}";
                         break;
+                    case InspectType.PinHeaderCounter: // **추가**
+                        PinHeaderCounter pinHeaderCounter = algo as PinHeaderCounter;                       
+                        inspResult.ResultValue = $"{pinHeaderCounter.pinCount}";
+                        break;
+                    case InspectType.ICLeadCounter: // **추가**
+                        ICLeadCounter icLeadCounter = algo as ICLeadCounter;
+                        inspResult.ResultValue = $"{icLeadCounter.icLeadCount}";
+                        break;
                 }
 
                 List<Rect> resultArea = new List<Rect>();

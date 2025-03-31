@@ -13,14 +13,26 @@ using EOI.Property;
 // **추가** 
 namespace EOI.Algorithm
 {
-    internal class PinHeaderCounter : InspAlgorithm
+    public class PinHeaderCounter : InspAlgorithm
     {
+        public string result { get; private set; } = "";
         public Mat ResultImage { get; private set; } // **추가**
         public PinHeaderCounterProp UIProp { get; set; } // **추가**
+
+        private Mat _resultImage = null; // **추가**
+        public int pinCount = 0;
+
+        public Mat GetResultImage()
+        {
+           return _resultImage;
+        }
+
         public PinHeaderCounter()
         {
             InspectType = InspectType.PinHeaderCounter;
         }
+
+        //public string result = null;
 
         public override bool DoInspect()
         {
@@ -55,19 +67,22 @@ namespace EOI.Algorithm
             foreach (var r in matchedRects)
                 Cv2.Rectangle(targetImage, r, Scalar.Red, 2);
 
-            ResultImage = targetImage.Clone(); // 결과 이미지 저장
+            _resultImage = targetImage.Clone(); // 결과 이미지 저장
 
-            int pinCount = matchedRects.Count;
+            pinCount = matchedRects.Count;
         
-            Console.WriteLine(pinCount != 4 ? "불량" : "양품");
+            result = pinCount != 4 ? "불량" : "양품";
+            Console.WriteLine(result);
 
             // 필요 시 디버깅 이미지 표시 (운영 버전에서는 주석 처리 가능)
             foreach (var r in matchedRects)
                 Cv2.Rectangle(targetImage, r, Scalar.Red, 2);
-            Cv2.ImShow("Detected Pins", ResultImage);
-            Cv2.WaitKey();
+            //Cv2.ImShow("Detected Pins", _resultImage);
+            //Cv2.WaitKey();
 
-            //UIProp?.SetImage(targetImage);
+            
+            //prop.SetReturnImg(_resultImage, result);
+
 
             return true;
         }

@@ -41,9 +41,9 @@ namespace EOI
             _contextMenu = new ContextMenuStrip();
 
             List<InspWindowType> windowTypeList;
-            if (MachineType.SMT == SettingXml.Inst.MachineType)
+            if (MachineType.SMT == SettingXml.Inst.MachineType) // **수정** 2025.03.31 CHB
             {
-                windowTypeList = new List<InspWindowType> { InspWindowType.Package, InspWindowType.Chip, InspWindowType.Pad, InspWindowType.ID };
+                windowTypeList = new List<InspWindowType> { InspWindowType.Package, InspWindowType.Chip, InspWindowType.PinHeaderCount, InspWindowType.ID, InspWindowType.ICLeadCount };
             }
             else
             {
