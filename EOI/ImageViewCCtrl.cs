@@ -351,6 +351,8 @@ namespace EOI
                             }
                         }
                     }
+                    //#HN#
+                    //여기 추가했더니 여러 ROI에 대해 각rect가 생성되고 align됨
                     foreach (var entity in _diagramEntityList)
                     {
                         InspWindow window = entity.LinkedWindow;
