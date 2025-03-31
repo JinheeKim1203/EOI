@@ -142,7 +142,7 @@ namespace EOI
         }
 
         //#MULTI ROI#6 InspWindow 타입에 따른, 칼라 정보 얻는 함수
-        public Color GetWindowColor(InspWindowType inspWindowType)
+        public static Color GetWindowColor(InspWindowType inspWindowType)
         {
             Color color = Color.LightBlue;
 

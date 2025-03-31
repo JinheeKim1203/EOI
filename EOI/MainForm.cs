@@ -41,9 +41,9 @@ namespace EOI
                     }
 
                     // ROI 다시 반영 (UI 업데이트)
-                    var updatedEntities = Global.Inst.InspStage.CurModel.CreateEntityList();
-                    var cameraForm = GetDockForm<CameraForm>();
-                    cameraForm?.SetEntities(updatedEntities); // 예: ImageViewCCtrl에 다시 그리기 요청
+                    //var updatedEntities = Global.Inst.InspStage.CurModel.CreateEntityList();
+                    //var cameraForm = GetDockForm<CameraForm>();
+                    //cameraForm?.SetEntities(updatedEntities); //ImageViewCCtrl에 다시 그리기 요청
                 }
             }
         }
@@ -73,8 +73,18 @@ namespace EOI
 
         private void LoadDockingWindows()
         {
+            //#HN#
             var cameraForm = GetDockForm<CameraForm>();
-            cameraForm.ImageViewCtrl.DiagramEntityEvent += imageViewCCtrl_DiagramEntityEvent;
+            if (cameraForm != null)
+            {
+                // 3. 이벤트 연결
+                cameraForm.ImageViewCCtrl.DiagramEntityEvent += imageViewCCtrl_DiagramEntityEvent;
+            }
+            else
+            {
+                // 예외 방지용 로그 또는 디버그 메시지
+                Console.WriteLine("CameraForm을 찾을 수 없습니다.");
+            }
 
             //도킹해제 금지 설정
             _dockPanel.AllowEndUserDocking = false;

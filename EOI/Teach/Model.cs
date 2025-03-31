@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using EOI;
+
 
 namespace EOI.Teach
 {
@@ -45,13 +47,17 @@ namespace EOI.Teach
 
             foreach (InspWindow win in InspWindowList)
             {
-                var entity = new DiagramEntity(win.WindowArea, imageViewCtrl.GetWindowColor(win.Type));
+                // Rect 변환
+                var rect = new System.Drawing.Rectangle(win.WindowArea.X, win.WindowArea.Y, win.WindowArea.Width, win.WindowArea.Height);
+
+                var entity = new DiagramEntity(rect, ImageViewCCtrl.GetWindowColor(win.Type));
                 entity.LinkedWindow = win;
                 list.Add(entity);
             }
 
             return list;
         }
+
 
         //#MODEL#4 새로운 InspWindow를 추가할때
         public InspWindow AddInspWindow(InspWindowType windowType)

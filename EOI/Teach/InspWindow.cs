@@ -36,7 +36,11 @@ namespace EOI.Teach
         
         //#HN#
         public Rectangle ExpandRect { get; set; }
+        public InspWindowType Type { get; set; }
         public bool IsTeach { get; set; } = false;
+        public List<InspWindow> InspWindowList { get; set; } = new List<InspWindow>();
+
+
 
         //#ABSTRACT ALGORITHM#9 개별 변수로 있던, MatchAlgorithm과 BlobAlgorithm을
         //InspAlgorithm으로 추상화하여 리스트로 관리하도록 변경
