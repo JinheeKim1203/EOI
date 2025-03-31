@@ -7,7 +7,6 @@ using EOI.Algorithm;
 using OpenCvSharp;
 using EOI.Core;
 using System.Security.Policy;
-using System.Drawing;
 using System.IO;
 using System.Xml.Serialization;
 using EOI.Setting;
@@ -35,7 +34,7 @@ namespace EOI.Teach
         public Rect InspArea { get; set; }
         
         //#HN#
-        public Rectangle ExpandRect { get; set; }
+        //public System.Drawing.Rectangle ExpandRect { get; set; }
         public InspWindowType Type { get; set; }
         public bool IsTeach { get; set; } = false;
         public List<InspWindow> InspWindowList { get; set; } = new List<InspWindow>();

@@ -29,9 +29,9 @@ namespace EOI.Algorithm
         //매칭이 설공했을때, 결과 매칭율
         public int OutScore { get; set; } = 0;
         //찾은 위치
-        public Point OutPoint { get; set; } = new Point(0, 0);
+        public OpenCvSharp.Point OutPoint { get; set; } = new OpenCvSharp.Point(0, 0);
 
-        public List<Point> OutPoints { get; set; } = new List<Point>();
+        public List<OpenCvSharp.Point> OutPoints { get; set; } = new List<OpenCvSharp.Point>();
 
         //템플릿 매칭으로 찾고 싶은 갯수
         public int MatchCount { get; set; } = 1;
