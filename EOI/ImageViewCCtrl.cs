@@ -87,7 +87,7 @@ namespace EOI
         private const float MaxZoom = 100.0f;
 
         //#MATCH PROP#11 템플릿 매칭 결과 출력을 위해 Rectangle 리스트 변수 설정
-        private List<Rectangle> _rectangles = new List<Rectangle>();
+        private List<Rectangle> _rectangles = new List<Rectangle>(); // 검사 결과 Rect
 
         //#MULTI ROI#5 수정에 필요한 타입 추가
 
@@ -347,12 +347,35 @@ namespace EOI
                             foreach (var rect in _rectangles)
                             {
                                 Rectangle screenRect = VirtualToScreen(rect);
-                                g.DrawRectangle(resultPen, screenRect);
+                                g.DrawRectangle(resultPen, screenRect); //결과 영역 표시
+                            }
+                        }
+                    }
+                    foreach (var entity in _diagramEntityList)
+                    {
+                        InspWindow window = entity.LinkedWindow;
+                        if (window == null || window.InspResultList == null)
+                            continue;
+
+                        foreach (var result in window.InspResultList)
+                        {
+                            if (result.ResultRectList == null)
+                                continue;
+
+                            foreach (var rect in result.ResultRectList)
+                            {
+                                Rectangle screenRect = VirtualToScreen(new Rectangle(rect.X, rect.Y, rect.Width, rect.Height));
+                                using (Pen pen = new Pen(Color.Red, 2))
+                                {
+                                    g.DrawRectangle(pen, screenRect);
+                                }
                             }
                         }
                     }
 
                     _screenSelectedRect = new Rectangle(0, 0, 0, 0);
+                    //EntityROI는 티칭된 ROI
+                    //InspResult.ResultRectList는 검사 결과로 얻어진 Rect
                     foreach (DiagramEntity entity in _diagramEntityList)
                     {
                         Rectangle screenRect = VirtualToScreen(entity.EntityROI);
@@ -368,7 +391,7 @@ namespace EOI
                                     : Rectangle.Union(_screenSelectedRect, screenRect);
                             }
 
-                            g.DrawRectangle(pen, screenRect);
+                            g.DrawRectangle(pen, screenRect); //ROI 그리는 핵심
                         }
 
                         if (_multiSelectedEntities.Count <= 1 && entity == _selEntity)
@@ -912,7 +935,7 @@ namespace EOI
         public void AddRect(List<Rectangle> rectangles)
         {
             _rectangles = rectangles;
-            Invalidate();
+            Invalidate();  // 다시 그리기
         }
 
         //#GROUP ROI#14 키보드 이벤트 받기 
