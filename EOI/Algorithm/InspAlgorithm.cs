@@ -25,7 +25,7 @@ namespace EOI.Algorithm
     public abstract class InspAlgorithm
     {
         //#ABSTRACT ALGORITHM#1 검사 알고리즘을 추상화하여, 공통된 값이나, 함수 정의
-        
+
         //알고리즘 타입 정의
         public InspectType InspectType { get; set; } = InspectType.InspNone;
 
@@ -42,7 +42,7 @@ namespace EOI.Algorithm
         //검사할 원본 이미지
         protected Mat _srcImage = null;
 
-        public List<string> ResultString { get; set; }
+        public List<string> ResultString { get; set; } = new List<string>();
 
         public bool IsDefect { get; set; }
 
@@ -59,13 +59,14 @@ namespace EOI.Algorithm
         {
             IsInspected = false;
             IsDefect = false;
+
             ResultString.Clear();
         }
 
         //검사 결과가 Rect정보로 출력이 가능하다면, 이 함수를 상속 받아서, 정보 반환
         public virtual int GetResultRect(out List<Rect> resultArea)
         {
-            resultArea  = null;
+            resultArea = null;
             return 0;
         }
 

@@ -111,7 +111,7 @@ namespace EOI.Inspect
         //#INSP WORKER#2 InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect()
         {
-            List<InspWindow> inspWindowList = Global.Inst.InspStage.InspWindowList;
+            List<InspWindow> inspWindowList = Global.Inst.InspStage.CurModel.InspWindowList;
 
             foreach (InspWindow inspWindow in inspWindowList)
             {
@@ -125,12 +125,14 @@ namespace EOI.Inspect
                 }
             }
 
+            _inspectBoard.InspectWindowList(inspWindowList);
+
             foreach (InspWindow inspWindow in inspWindowList)
             {
                 if (inspWindow == null)
                     continue;
 
-                inspWindow.DoInspect(InspectType.InspNone);
+                //inspWindow.DoInspect(InspectType.InspNone);
                 DisplayResult(inspWindow, InspectType.InspNone);
             }
 
@@ -230,7 +232,7 @@ namespace EOI.Inspect
             List<InspAlgorithm> inspAlgorithmList = inspObj.AlgorithmList;
             foreach (var algorithm in inspAlgorithmList)
             {
-                if (algorithm.InspectType != inspType && algorithm.InspectType != InspectType.InspNone)
+                if (algorithm.InspectType != inspType && inspType != InspectType.InspNone)
                     continue;
 
                 List<Rect> resultArea = new List<Rect>();
