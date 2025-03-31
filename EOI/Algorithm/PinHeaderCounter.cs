@@ -15,10 +15,12 @@ namespace EOI.Algorithm
 {
     public class PinHeaderCounter : InspAlgorithm
     {
-        public string result { get; private set; } = "";
-        public Mat ResultImage { get; private set; } // **추가**
-        public PinHeaderCounterProp UIProp { get; set; } // **추가**
+        public string result { get;  set; } = "";
 
+        //[XmlIgnore]
+        //public Mat ResultImage { get;  set; } // **추가**
+
+        [XmlIgnore] // xml은 모든것을 저장하려는 성격이기 때문에 Mat정보는 저장할 필요가 없으므로 이렇게 해야 함.
         private Mat _resultImage = null; // **추가**
         public int pinCount = 0;
 

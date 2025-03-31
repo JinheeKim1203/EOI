@@ -26,14 +26,6 @@ namespace EOI.Property
             //this.Controls.Add(this.lblStatus);
         }
 
-        public void SetReturnImg(Mat img, string result)
-        {
-            Bitmap bmpImage = BitmapConverter.ToBitmap(img);
-            picContour.Image = bmpImage;
-            lblStatus.Text = result;
-        }
-
-
         public void SetAlgorithm(PinHeaderCounter pinHeaderCounter)
         {
             _pinHeaderCounter = pinHeaderCounter;

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 // **추가** CHB
 namespace EOI.Algorithm
 {
-    internal class ICLeadCounter : InspAlgorithm
+    public class ICLeadCounter : InspAlgorithm
     {
+        [XmlIgnore]
         public Mat ResultImage { get; private set; }
 
         public int icLeadCount = 0;
