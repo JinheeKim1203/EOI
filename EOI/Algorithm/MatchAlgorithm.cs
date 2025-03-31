@@ -62,6 +62,13 @@ namespace EOI.Algorithm
             if (_templateImage is null)
                 return false;
 
+            // ⬇️ 이부분 추가함: 템플릿이 입력 이미지보다 크면 매칭 수행 불가
+            if (image.Width < _templateImage.Width || image.Height < _templateImage.Height)
+            {
+                Console.WriteLine("MatchTemplate skipped: template is larger than image.");
+                return false;
+            }
+
             Mat result = new Mat();
 
             // 템플릿 매칭 수행

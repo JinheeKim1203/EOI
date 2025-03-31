@@ -30,7 +30,20 @@ namespace EOI.Teach
         public string Name { get; set; }
         public string UID { get; set; }
 
-        public Rect WindowArea { get; set; }
+        private Rect _windowArea = new Rect();
+
+        public Rect WindowArea
+        {
+            get
+            {
+                return _windowArea;
+            }
+            set
+            {
+                _windowArea = value;
+                InspArea = _windowArea;
+            }
+        }
         public Rect InspArea { get; set; }
         
         //#HN#

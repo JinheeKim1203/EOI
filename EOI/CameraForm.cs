@@ -235,12 +235,15 @@ namespace EOI
                 }
                 else if (window.Parent == null)
                 {
-                    DiagramEntity entity = new DiagramEntity()
+                    DiagramEntity entity = new DiagramEntity() //#HN#->WindowArea를 InspArea로 바꿈
                     {
                         LinkedWindow = window,
                         EntityROI = new Rectangle(
-                            window.WindowArea.X, window.WindowArea.Y,
+                            window.InspArea.X, window.InspArea.Y,
                                 window.WindowArea.Width, window.WindowArea.Height),
+                        //EntityROI = new Rectangle(
+                        //    window.InspArea.X, window.InspArea.Y,
+                        //        window.InspArea.Width, window.InspArea.Height),
                         EntityColor = ImageViewCCtrl.GetWindowColor(window.InspWindowType),
                         IsHold = window.IsTeach
                     };

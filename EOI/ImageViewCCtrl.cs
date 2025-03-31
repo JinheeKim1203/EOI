@@ -454,7 +454,7 @@ namespace EOI
                 }
             }
         }
-        
+
         private void DrawInspParam(Graphics g, InspWindow window)
         {
             if (window is null)
@@ -704,35 +704,56 @@ namespace EOI
                     //모델에 InspWindow 크기 변경 이벤트 발생
                     DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Resize, _selEntity.LinkedWindow, _newRoiType, _roiRect, new Point()));
                 }
+                //#HN#
                 else if (_isMovingRoi)
                 {
                     _isMovingRoi = false;
 
-                    //기준 ROI 이동 시 offset 전달됨
                     if (_selEntity != null)
                     {
                         InspWindow linkedWindow = _selEntity.LinkedWindow;
 
-                        //ROI가 얼마나 이동했는지를 계산한 값
-                        //Align 처리 시 기준 ROI의 이동량을 기반으로 다른 ROI들도 동일하게 이동시키는 데 사용
                         Point offsetMove = new Point(0, 0);
                         if (linkedWindow != null)
                         {
                             offsetMove.X = _selEntity.EntityROI.X - linkedWindow.WindowArea.X;
                             offsetMove.Y = _selEntity.EntityROI.Y - linkedWindow.WindowArea.Y;
+
+                            // 기준 ROI 외의 다른 ROI도 같이 이동
+                            foreach (DiagramEntity entity in _diagramEntityList)
+                            {
+                                if (entity == _selEntity || entity.IsHold)
+                                    continue;
+
+                                Rectangle roi = entity.EntityROI;
+                                roi.Offset(offsetMove);
+                                entity.EntityROI = roi;
+
+                                if (entity.LinkedWindow != null)
+                                    _selEntity.LinkedWindow.WindowArea = new OpenCvSharp.Rect(
+                                        _selEntity.EntityROI.X,
+                                        _selEntity.EntityROI.Y,
+                                        _selEntity.EntityROI.Width,
+                                        _selEntity.EntityROI.Height); 
+                            }
                         }
 
                         //모델에 InspWindow 이동 이벤트 발생
                         if (offsetMove.X != 0 || offsetMove.Y != 0)
-                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove));
-                        // 여기서 offsetMove를 통해 기준 ROI가 얼마나 이동했는지를 외부로 이벤트로 전달
-
+                        {
+                            DiagramEntityEvent?.Invoke(this,
+                                new DiagramEntityEventArgs(EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove));
+                        }
                         else
-                            //모델에 InspWindow 선택 변경 이벤트 발생
-                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow));
+                        {
+                            DiagramEntityEvent?.Invoke(this,
+                                new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow));
+                        }
+                        Invalidate(); // 변경된 ROI 위치를 다시 화면에 그리기
 
                     }
                 }
+
                 // ROI 선택 완료
                 if (_isBoxSelecting)
                 {
@@ -977,12 +998,23 @@ namespace EOI
             base.OnKeyUp(e);
         }
 
+        //#HN#
         public bool SetDiagramEntityList(List<DiagramEntity> diagramEntityList)
         {
-            //작은 roi가 먼저 선택되도록, 소팅
             _diagramEntityList = diagramEntityList
-                                .OrderBy(r => r.EntityROI.Width * r.EntityROI.Height)
-                                .ToList();
+        .OrderBy(r => r.EntityROI.Width * r.EntityROI.Height)
+        .ToList();
+
+            // 👇 여기 추가!
+            foreach (var entity in _diagramEntityList)
+            {
+                if (entity.LinkedWindow != null)
+                {
+                    entity.LinkedWindow.WindowArea = new OpenCvSharp.Rect(
+                        entity.EntityROI.X, entity.EntityROI.Y,
+                        entity.EntityROI.Width, entity.EntityROI.Height);
+                }
+            }
 
             _selEntity = null;
             Invalidate();

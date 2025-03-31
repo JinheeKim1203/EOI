@@ -593,6 +593,8 @@ namespace EOI.Core
             if (!_inspWorker.RunInspect())
                 return false;
 
+            UpdateDiagramEntity();
+
             return true;
         }
 
