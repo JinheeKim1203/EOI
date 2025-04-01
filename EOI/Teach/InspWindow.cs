@@ -62,9 +62,6 @@ namespace EOI.Teach
         [XmlElement("InspAlgorithm")]
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
 
-        [XmlIgnore] // **추가**
-        //부모-자식 관계를 위한 변수 추가
-
         [XmlIgnore] 
         public InspWindow Parent { get; set; }
 

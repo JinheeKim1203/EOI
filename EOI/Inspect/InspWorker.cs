@@ -87,7 +87,7 @@ namespace EOI.Inspect
             if (!UpdateInspData(inspWindow))
                 return;
 
-            inspWindow.DoInpsect(InspectType.InspNone);
+            inspWindow.DoInspect(InspectType.InspNone);
 
             // **jh ✅ 기존 검사 결과 박스 표시
             DisplayResult(inspWindow, InspectType.InspNone);
