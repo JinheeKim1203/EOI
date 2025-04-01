@@ -13,6 +13,7 @@ using System.Xml.Serialization;
 using EOI.Setting;
 using System.Xml.Linq;
 using EOI.Inspect;
+using System.Windows.Forms;
 
 namespace EOI.Teach
 {
@@ -225,6 +226,23 @@ namespace EOI.Teach
         {
             if (curModel is null)
                 return false;
+
+            // ✅ 삭제 예정 이미지가 있는지 확인
+            foreach (var algo in AlgorithmList)
+            {
+                if (algo is MatchAlgorithm matchAlgo && matchAlgo.DeletedTemplateList.Count > 0)
+                {
+                    var result = MessageBox.Show(
+                        "삭제 예정인 티칭 이미지가 있습니다.\n정말 삭제하고 저장하시겠습니까?",
+                        "확인",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.No)
+                        return false; // 저장 취소
+                    break; // 하나만 확인하면 충분
+                }
+            }
 
             string imgDir = Path.Combine(Path.GetDirectoryName(curModel.ModelPath), "Images");
             if (!Directory.Exists(imgDir))

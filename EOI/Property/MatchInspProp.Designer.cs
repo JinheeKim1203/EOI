@@ -45,6 +45,7 @@
             this.lbExtent = new System.Windows.Forms.Label();
             this.flwTeachList = new System.Windows.Forms.FlowLayoutPanel();
             this.btnDeleteTeachImage = new System.Windows.Forms.Button();
+            this.btnUndoDeleteTeachImage = new System.Windows.Forms.Button();
             this.grpMatch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTeachImage)).BeginInit();
             this.SuspendLayout();
@@ -62,6 +63,7 @@
             this.grpMatch.Controls.Add(this.lbExtent);
             this.grpMatch.Controls.Add(this.flwTeachList);
             this.grpMatch.Controls.Add(this.btnDeleteTeachImage);
+            this.grpMatch.Controls.Add(this.btnUndoDeleteTeachImage);
             this.grpMatch.Location = new System.Drawing.Point(4, 4);
             this.grpMatch.Margin = new System.Windows.Forms.Padding(4);
             this.grpMatch.Name = "grpMatch";
@@ -170,6 +172,15 @@
             this.btnDeleteTeachImage.Text = "선택 티칭 이미지 삭제";
             this.btnDeleteTeachImage.Click += new System.EventHandler(this.btnDeleteTeachImage_Click);
             // 
+            // btnUndoDeleteTeachImage
+            // 
+            this.btnUndoDeleteTeachImage.Location = new System.Drawing.Point(377, 438);
+            this.btnUndoDeleteTeachImage.Name = "btnUndoDeleteTeachImage";
+            this.btnUndoDeleteTeachImage.Size = new System.Drawing.Size(133, 30);
+            this.btnUndoDeleteTeachImage.TabIndex = 10;
+            this.btnUndoDeleteTeachImage.Text = "삭제 취소";
+            this.btnUndoDeleteTeachImage.Click += new System.EventHandler(this.btnUndoDeleteTeachImage_Click);
+            // 
             // MatchInspProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
@@ -199,5 +210,6 @@
         private System.Windows.Forms.PictureBox picTeachImage;
         private System.Windows.Forms.FlowLayoutPanel flwTeachList;
         private System.Windows.Forms.Button btnDeleteTeachImage;
+        private System.Windows.Forms.Button btnUndoDeleteTeachImage;
     }
 }

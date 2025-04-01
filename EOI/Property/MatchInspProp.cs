@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
@@ -142,19 +143,26 @@ namespace EOI.Property
             if (!Directory.Exists(imgDir))
                 return;
 
-            var files = Directory.GetFiles(imgDir, $"{uid}_T*.png")
-        .Where(f => _matchAlgo.DeletedTemplateList.Contains(f) == false) // ❌ 삭제 예약된 이미지 제외
-        .ToArray();
+            var files = Directory.GetFiles(imgDir, $"{uid}_T*.png");
 
             foreach (var file in files)
             {
                 PictureBox thumb = new PictureBox();
-                thumb.Image = SafeLoadImage(file); // ✅ 복사된 이미지 사용
+                thumb.Image = SafeLoadImage(file);
                 thumb.SizeMode = PictureBoxSizeMode.Zoom;
                 thumb.Size = new System.Drawing.Size(60, 60);
                 thumb.Margin = new Padding(5);
                 thumb.Cursor = Cursors.Hand;
                 thumb.Tag = file;
+
+                // ✅ 삭제된 이미지라면 흐리게 표시
+                if (_matchAlgo.DeletedTemplateList.Contains(file))
+                {
+                    thumb.BorderStyle = BorderStyle.FixedSingle;
+                    thumb.BackColor = Color.LightGray;
+                    thumb.Enabled = true;
+                    thumb.Image = SetImageOpacity(thumb.Image, 0.4f); // 흐리게
+                }
                 thumb.Click += OnTeachThumbnailClick;
 
                 flwTeachList.Controls.Add(thumb);
@@ -172,8 +180,12 @@ namespace EOI.Property
 
                 picTeachImage.Image?.Dispose();
                 picTeachImage.Image = Image.FromFile(path);
+
+                // ✅ 삭제된 이미지라면 복구 버튼 활성화
+                btnUndoDeleteTeachImage.Enabled = _matchAlgo.DeletedTemplateList.Contains(path);
             }
         }
+        
 
         // **jh
         private void btnDeleteTeachImage_Click(object sender, EventArgs e)
@@ -229,6 +241,46 @@ namespace EOI.Property
                     return b1.SequenceEqual(b2);
                 }
             }
+        }
+
+        // **jh 나중에 다른 곳에서도 사용하고 싶으면 별도의 클래스로 분리해도 좋음(이미지 회색으로 연하게)
+        private void btnUndoDeleteTeachImage_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_selectedTemplatePath))
+            {
+                MessageBox.Show("복구할 이미지를 선택하세요.");
+                return;
+            }
+
+            if (_matchAlgo == null || !_matchAlgo.DeletedTemplateList.Contains(_selectedTemplatePath))
+            {
+                MessageBox.Show("선택한 이미지는 삭제 목록에 없습니다.");
+                return;
+            }
+
+            // ✅ 삭제 예약 취소
+            _matchAlgo.DeletedTemplateList.Remove(_selectedTemplatePath);
+
+            MessageBox.Show("삭제 취소되었습니다.");
+
+            RefreshTeachImageList(); // 다시 썸네일 갱신
+        }
+
+        private Image SetImageOpacity(Image image, float opacity)
+        {
+            Bitmap bmp = new Bitmap(image.Width, image.Height);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                ColorMatrix matrix = new ColorMatrix();
+                matrix.Matrix33 = opacity; // 투명도 설정
+                ImageAttributes attributes = new ImageAttributes();
+                attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                g.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height),
+                    0, 0, image.Width, image.Height,
+                    GraphicsUnit.Pixel, attributes);
+            }
+            return bmp;
         }
     }
 }
