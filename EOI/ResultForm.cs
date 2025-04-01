@@ -230,6 +230,15 @@ namespace EOI
         {
             if (inspWindow == null)
                 return;
+            /* 2025.04.01 CHB 이건 따로 싸이클을 누른 후 검사를 하니 
+             * 크로스 스레드 작업이 잘못되었다고, 컨트롤이 자신이 만들어진 스레드가 아닌
+             * 스레드에서 엑세스되었다는 문구가 떠서 아래 코드를 추가함.
+             */
+            if (_treeListView.InvokeRequired)
+            {
+                _treeListView.Invoke(new Action(() => RefreshWindow(inspWindow)));
+                return;
+            }
 
             _treeListView.RefreshObject(inspWindow);
             foreach (var child in inspWindow.InspResultList)

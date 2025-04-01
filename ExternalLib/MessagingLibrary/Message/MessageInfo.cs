@@ -13,11 +13,15 @@ namespace MessagingLibrary
 		// 번호 적혀있는건 기존에 쓰고 있는 스트링이라 바꾸면 안됨
 		public enum MessageCommand : int
 		{
-            None,
+            None = -1,
+            HandShake,
             OpenRecipe,
+            MmiReady,
+            MmiStart,
+            MmiStop,
             InspReady,
-			InspStart,
-			InspDone,
+            InspStart,
+            InspDone,
             InspResult,
             InspEnd,
             Reset,

@@ -379,7 +379,7 @@ namespace EOI.Sequence
 
         private void ResetSequence()
         {
-            _visionState = VisionSeq.None;
+            _mmiState = MmiSeq.None;
         }
 
 
