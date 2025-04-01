@@ -32,15 +32,18 @@
             this.lblContour = new System.Windows.Forms.Label();
             this.lblPin = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblPinCounter = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picContour)).BeginInit();
             this.SuspendLayout();
             // 
             // picContour
             // 
             this.picContour.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.picContour.Location = new System.Drawing.Point(15, 64);
+            this.picContour.Location = new System.Drawing.Point(19, 77);
+            this.picContour.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.picContour.Name = "picContour";
-            this.picContour.Size = new System.Drawing.Size(317, 183);
+            this.picContour.Size = new System.Drawing.Size(396, 220);
             this.picContour.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picContour.TabIndex = 0;
             this.picContour.TabStop = false;
@@ -49,9 +52,10 @@
             // 
             this.lblContour.AutoSize = true;
             this.lblContour.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lblContour.Location = new System.Drawing.Point(11, 28);
+            this.lblContour.Location = new System.Drawing.Point(14, 34);
+            this.lblContour.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblContour.Name = "lblContour";
-            this.lblContour.Size = new System.Drawing.Size(193, 20);
+            this.lblContour.Size = new System.Drawing.Size(228, 24);
             this.lblContour.TabIndex = 1;
             this.lblContour.Text = "윤곽선 감지 이미지";
             // 
@@ -59,9 +63,10 @@
             // 
             this.lblPin.AutoSize = true;
             this.lblPin.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lblPin.Location = new System.Drawing.Point(11, 264);
+            this.lblPin.Location = new System.Drawing.Point(14, 317);
+            this.lblPin.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPin.Name = "lblPin";
-            this.lblPin.Size = new System.Drawing.Size(154, 20);
+            this.lblPin.Size = new System.Drawing.Size(180, 24);
             this.lblPin.TabIndex = 1;
             this.lblPin.Text = "핀 헤더 상태 : ";
             // 
@@ -69,22 +74,48 @@
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lblStatus.Location = new System.Drawing.Point(162, 264);
+            this.lblStatus.Location = new System.Drawing.Point(202, 317);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(33, 20);
+            this.lblStatus.Size = new System.Drawing.Size(38, 24);
             this.lblStatus.TabIndex = 1;
             this.lblStatus.Text = "??";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label1.Location = new System.Drawing.Point(15, 357);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(205, 24);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "검사된 핀 갯수 : ";
+            // 
+            // lblPinCounter
+            // 
+            this.lblPinCounter.AutoSize = true;
+            this.lblPinCounter.Font = new System.Drawing.Font("굴림", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lblPinCounter.Location = new System.Drawing.Point(228, 357);
+            this.lblPinCounter.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblPinCounter.Name = "lblPinCounter";
+            this.lblPinCounter.Size = new System.Drawing.Size(38, 24);
+            this.lblPinCounter.TabIndex = 1;
+            this.lblPinCounter.Text = "??";
+            // 
             // PinHeaderCounterProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblPinCounter);
             this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.lblPin);
             this.Controls.Add(this.lblContour);
             this.Controls.Add(this.picContour);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "PinHeaderCounterProp";
-            this.Size = new System.Drawing.Size(348, 366);
+            this.Size = new System.Drawing.Size(435, 439);
             ((System.ComponentModel.ISupportInitialize)(this.picContour)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -97,5 +128,7 @@
         private System.Windows.Forms.Label lblContour;
         private System.Windows.Forms.Label lblPin;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblPinCounter;
     }
 }

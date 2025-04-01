@@ -15,6 +15,9 @@ namespace EOI.Algorithm
 {
     public class PinHeaderCounter : InspAlgorithm
     {
+
+        public event EventHandler ImageChanged;  // **jh 이미지가 바뀌었을 때 발생하는 이벤트
+
         public string result { get;  set; } = "";
 
         //[XmlIgnore]
@@ -43,6 +46,9 @@ namespace EOI.Algorithm
             if (_srcImage == null)
                 return false;
 
+            int imageWidth = _srcImage.Width;
+            int imageHeight = _srcImage.Height;
+
             Mat targetImage = _srcImage[InspRect];
 
             Mat grayImage = new Mat();
@@ -60,7 +66,7 @@ namespace EOI.Algorithm
             foreach (var contour in contours)
             {
                 var rect = Cv2.BoundingRect(contour);
-                if (rect.Width < 30 && rect.Height > 70) // 2025.04.01 **수정** 수치 수정 (30, 70)
+                if (rect.Width < 25 && rect.Height > 70) // 2025.04.01 **수정** 수치 수정 (30, 70)
                 {
                     matchedRects.Add(rect);
                 }
@@ -70,11 +76,14 @@ namespace EOI.Algorithm
                 Cv2.Rectangle(targetImage, r, Scalar.Red, 2);
 
             _resultImage = targetImage.Clone(); // 결과 이미지 저장
+            
+
 
             pinCount = matchedRects.Count;
         
             result = pinCount != 4 ? "불량" : "양품";
-            Console.WriteLine(result);
+
+            ImageChanged?.Invoke(this, EventArgs.Empty);  // **jh 이벤트 발생
 
             // 필요 시 디버깅 이미지 표시 (운영 버전에서는 주석 처리 가능)
             foreach (var r in matchedRects)

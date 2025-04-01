@@ -29,6 +29,8 @@ namespace EOI.Property
         public void SetAlgorithm(PinHeaderCounter pinHeaderCounter)
         {
             _pinHeaderCounter = pinHeaderCounter;
+            // ✅ 여기서 이벤트를 연결해줘야 자동 반응
+            _pinHeaderCounter.ImageChanged += (s, e) => SetProperty(); // **jh
             SetProperty();
         }
 
@@ -54,10 +56,12 @@ namespace EOI.Property
             if (lblStatus.InvokeRequired)
             {
                 lblStatus.Invoke(new Action(() => lblStatus.Text = _pinHeaderCounter.result));
+                lblStatus.Invoke(new Action(() => lblPinCounter.Text = Convert.ToString(_pinHeaderCounter.pinCount)));
             }
             else
             {
                 lblStatus.Text = _pinHeaderCounter.result; ;
+                lblPinCounter.Text = Convert.ToString(_pinHeaderCounter.pinCount);
             }
             //lblStatus.Text = _pinHeaderCounter.result;
         }
