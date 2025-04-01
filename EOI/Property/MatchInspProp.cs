@@ -142,7 +142,9 @@ namespace EOI.Property
             if (!Directory.Exists(imgDir))
                 return;
 
-            var files = Directory.GetFiles(imgDir, $"{uid}_T*.png");
+            var files = Directory.GetFiles(imgDir, $"{uid}_T*.png")
+        .Where(f => _matchAlgo.DeletedTemplateList.Contains(f) == false) // ❌ 삭제 예약된 이미지 제외
+        .ToArray();
 
             foreach (var file in files)
             {
@@ -193,8 +195,8 @@ namespace EOI.Property
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                // 이미지 파일 삭제
-                File.Delete(_selectedTemplatePath);
+                // 삭제 예약 리스트에 추가 ✅
+                _matchAlgo?.DeletedTemplateList.Add(_selectedTemplatePath);
 
                 // 경로 초기화
                 _selectedTemplatePath = null;

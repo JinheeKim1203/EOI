@@ -228,17 +228,28 @@ namespace EOI.Teach
 
             string imgDir = Path.Combine(Path.GetDirectoryName(curModel.ModelPath), "Images");
             if (!Directory.Exists(imgDir))
-            {
                 Directory.CreateDirectory(imgDir);
+
+            // ✅ MatchAlgorithm 이미지 삭제 + 리네이밍
+            foreach (var algo in AlgorithmList)
+            {
+                if (algo is MatchAlgorithm matchAlgo)
+                {
+                    matchAlgo.CleanupTemplates(); // 🔥 삭제 예약 반영 + T001부터 정렬
+                }
             }
 
-            // jh ✅ 여기만 수정! UID_T001, T002... 형식으로 저장되도록
-            Mat windowImage = WindowImage;
-            if (windowImage != null)
+            // ✅ 마지막으로 현재 WindowImage 저장 (맨 뒤로 추가)
+            if (WindowImage != null)
             {
-                int nextIndex = GetNextTeachIndex(imgDir, UID);
-                string targetPath = Path.Combine(imgDir, $"{UID}_T{nextIndex:D3}.png");
-                Cv2.ImWrite(targetPath, windowImage);
+                string uid = UID;
+
+                // 저장된 파일 개수 파악
+                var files = Directory.GetFiles(imgDir, $"{uid}_T*.png");
+                int nextIndex = files.Length + 1;
+
+                string targetPath = Path.Combine(imgDir, $"{uid}_T{nextIndex:D3}.png");
+                Cv2.ImWrite(targetPath, WindowImage);
             }
 
             return true;

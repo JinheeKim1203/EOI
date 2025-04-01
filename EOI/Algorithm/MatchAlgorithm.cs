@@ -43,6 +43,8 @@ namespace EOI.Algorithm
         [XmlIgnore]
         public InspWindow LinkedWindow { get; set; }
 
+        public List<string> DeletedTemplateList { get; } = new List<string>();
+
         public MatchAlgorithm()
         {
             //#ABSTRACT ALGORITHM#2 각 함수마다 자신의 알고리즘 타입 설정
@@ -362,6 +364,47 @@ namespace EOI.Algorithm
             }
 
             return resultArea.Count;
+        }
+
+        public void CleanupTemplates()
+        {
+            if (LinkedWindow == null) return;
+
+            string modelPath = Global.Inst.InspStage.CurModel.ModelPath;
+            string uid = LinkedWindow.UID;
+            string imgDir = Path.Combine(Path.GetDirectoryName(modelPath), "Images");
+
+            if (!Directory.Exists(imgDir)) return;
+
+            // 1. 삭제 예약된 이미지 제거
+            foreach (string delPath in DeletedTemplateList)
+            {
+                try
+                {
+                    if (File.Exists(delPath))
+                        File.Delete(delPath);
+                }
+                catch (Exception ex)
+                {
+                    // 로그나 예외 핸들링
+                }
+            }
+
+            // 2. 남은 이미지 재정렬
+            var files = Directory.GetFiles(imgDir, $"{uid}_T*.png")
+                                 .OrderBy(f => f)
+                                 .ToList();
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                string newPath = Path.Combine(imgDir, $"{uid}_T{i + 1:D3}.png");
+                if (files[i] != newPath)
+                {
+                    File.Move(files[i], newPath);
+                }
+            }
+
+            DeletedTemplateList.Clear();
         }
 
     }
