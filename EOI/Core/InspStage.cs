@@ -77,9 +77,6 @@ namespace EOI.Core
             }
         }
 
-        //#INSP WORKER#1 1개만 있던 InspWindow를 리스트로 변경하여, 여러개의 ROI를 관리하도록 개선
-        public List<InspWindow> InspWindowList { get; set; } = new List<InspWindow>();
-
         public bool LiveMode { get; set; } = false;
 
         public int SelBufferIndex { get; set; } = 0;
@@ -375,7 +372,7 @@ namespace EOI.Core
             inspWindow.IsTeach = false;
             SetTeachingImage(inspWindow);
             UpdateProperty(inspWindow);
-            UpdateDiagramEntity();
+            UpdateDiagramEntity(); // 변경된 모델 정보 갱신, 즉 ROI를 추가할 때마다 정보가 반영됨.
 
             CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
@@ -497,7 +494,7 @@ namespace EOI.Core
             MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
             if (matchAlgo != null)
             {
-                matchAlgo.SetTemplateImage(windowImage);
+                matchAlgo.SetTemplateImage(windowImage); // 해당 ROI 영역을 "이미지 템플릿 매칭"을 위한 이미지로 설정.
             }
         }
 
@@ -597,7 +594,9 @@ namespace EOI.Core
             if (isCycle)
                 _inspWorker.StartCycleInspectImage();
             else
+            {               
                 OneCycle();
+            }            
         }
 
         public bool OneCycle()
@@ -613,8 +612,13 @@ namespace EOI.Core
                     return false;
             }
 
-            if (!_inspWorker.RunInspect())
-                return false;
+            if (!_inspWorker.RunInspect()) // 무조건적으로 검사가 끝나고 난 후 이미지가 나오게 실행. (Contour한정)
+                return false;            
+
+            UpdateProperty(CurModel.InspWindowList[0]);// **추가** 검사 결과를 바로 확인하기 위해 추가 2025.03.31
+            
+
+            UpdateDiagramEntity();
 
             return true;
         }

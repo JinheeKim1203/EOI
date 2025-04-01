@@ -75,7 +75,7 @@ namespace EOI.Property
             // **jh
             RefreshTeachImageList();
         }
-
+        
         private void OnUpdateValue(object sender, EventArgs e)
         {
             if (_matchAlgo == null)

@@ -1,5 +1,6 @@
 ﻿using EOI.Core;
 using EOI.Setting;
+using EOI.Teach;
 using EOI.Util;
 using OpenCvSharp;
 using System;
@@ -18,6 +19,36 @@ namespace EOI
 {
     public partial class MainForm : Form
     {
+        private void imageViewCCtrl_DiagramEntityEvent(object sender, DiagramEntityEventArgs e)
+        {
+            if (e.ActionType == EntityActionType.Move)
+            {
+                if (e.InspWindow.Type == InspWindowType.ID) // 기준 ROI만 처리
+                {
+                    int offsetX = e.OffsetMove.X;
+                    int offsetY = e.OffsetMove.Y;
+
+                    // 기준 ROI를 제외한 모든 ROI에 offset 적용
+                    foreach (InspWindow win in Global.Inst.InspStage.CurModel.InspWindowList)
+                    {
+                        if (win == e.InspWindow) continue;
+
+                        win.WindowArea = new OpenCvSharp.Rect(
+                            win.WindowArea.X + offsetX,
+                            win.WindowArea.Y + offsetY,
+                            win.WindowArea.Width,
+                            win.WindowArea.Height);
+                    }
+
+                    // ROI 다시 반영 (UI 업데이트)
+                    //var updatedEntities = Global.Inst.InspStage.CurModel.CreateEntityList();
+                    //var cameraForm = GetDockForm<CameraForm>();
+                    //cameraForm?.SetEntities(updatedEntities); //ImageViewCCtrl에 다시 그리기 요청
+                }
+            }
+        }
+
+
         private static DockPanel _dockPanel;
 
         public MainForm()
@@ -42,6 +73,19 @@ namespace EOI
 
         private void LoadDockingWindows()
         {
+            //#HN#
+            var cameraForm = GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                // 3. 이벤트 연결
+                cameraForm.ImageViewCCtrl.DiagramEntityEvent += imageViewCCtrl_DiagramEntityEvent;
+            }
+            else
+            {
+                // 예외 방지용 로그 또는 디버그 메시지
+                Console.WriteLine("CameraForm을 찾을 수 없습니다.");
+            }
+
             //도킹해제 금지 설정
             _dockPanel.AllowEndUserDocking = false;
 

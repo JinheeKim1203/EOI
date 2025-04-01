@@ -67,6 +67,14 @@ namespace EOI.Inspect
                         BlobAlgorithm blobAlgo = algo as BlobAlgorithm;
                         inspResult.ResultValue = $"{blobAlgo.OutBlobCount}/{blobAlgo.BlobCount}";
                         break;
+                    case InspectType.PinHeaderCounter: // **추가**
+                        PinHeaderCounter pinHeaderCounter = algo as PinHeaderCounter;                       
+                        inspResult.ResultValue = $"{pinHeaderCounter.pinCount}";
+                        break;
+                    case InspectType.ICLeadCounter: // **추가**
+                        ICLeadCounter icLeadCounter = algo as ICLeadCounter;
+                        inspResult.ResultValue = $"{icLeadCounter.icLeadCount}";
+                        break;
                 }
 
                 List<Rect> resultArea = new List<Rect>();
@@ -107,7 +115,7 @@ namespace EOI.Inspect
             {
                 //모든 윈도우에 오프셋 반영
                 window.SetInspOffset(alignOffset);
-                if (!InspectWindow(window))
+                if (!InspectWindow(window)) // 여기에 DoInspect()함수가 호출되어 알고리즘 검사가 적용됨.
                     return false;
             }
 

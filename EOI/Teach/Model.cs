@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using EOI;
+
 
 namespace EOI.Teach
 {
@@ -39,11 +41,29 @@ namespace EOI.Teach
             InspWindowList = new List<InspWindow>();
         }
 
+        public List<DiagramEntity> CreateEntityList()
+        {
+            var list = new List<DiagramEntity>();
+
+            foreach (InspWindow win in InspWindowList)
+            {
+                // Rect 변환
+                var rect = new System.Drawing.Rectangle(win.WindowArea.X, win.WindowArea.Y, win.WindowArea.Width, win.WindowArea.Height);
+
+                var entity = new DiagramEntity(rect, ImageViewCCtrl.GetWindowColor(win.Type));
+                entity.LinkedWindow = win;
+                list.Add(entity);
+            }
+
+            return list;
+        }
+
+
         //#MODEL#4 새로운 InspWindow를 추가할때
         public InspWindow AddInspWindow(InspWindowType windowType)
         {
             InspWindow inspWindow = InspWindowFactory.Inst.Create(windowType);
-            InspWindowList.Add(inspWindow);
+            InspWindowList.Add(inspWindow); // 해당 ROI를 내가 그린 ROI 리스트에 추가.
 
             return inspWindow;
         }

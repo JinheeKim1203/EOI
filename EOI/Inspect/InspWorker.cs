@@ -117,10 +117,10 @@ namespace EOI.Inspect
             {
                 Global.Inst.InspStage.OneCycle();
 
-                //Thread.Sleep(200); // 주기 설정
+                Thread.Sleep(700); // 2025.04.01 **수정** 주기 설정 (검사 시간 텀 설정)
             }
         }
-
+        //#HN#
         //#INSP WORKER#2 InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect()
         {
@@ -133,16 +133,24 @@ namespace EOI.Inspect
 
             foreach (var inspWindow in inspWindowList)
             {
-                if (inspWindow is null)
+                if (inspWindow == null)
                     continue;
 
-                UpdateInspData(inspWindow);
+                List<InspAlgorithm> algorithmList = inspWindow.AlgorithmList;
+                foreach (InspAlgorithm algorithm in algorithmList)
+                {
+                    UpdateInspData(inspWindow);
+                }
             }
 
             _inspectBoard.InspectWindowList(inspWindowList);
 
-            foreach (var inspWindow in inspWindowList)
+            foreach (InspWindow inspWindow in inspWindowList)
             {
+                if (inspWindow == null)
+                    continue;
+
+                //inspWindow.DoInspect(InspectType.InspNone);
                 DisplayResult(inspWindow, InspectType.InspNone);
 
                 // ✅ 검사 결과 트리뷰에 추가로 표시
@@ -174,9 +182,9 @@ namespace EOI.Inspect
             }
             else
             {
-                RunInspect();
+                RunInspect(); // 해당 InspWindow(ROI)에 적용된 모든 알고리즘을 검사.
             }
-
+            // 결과창에 검사 결과 출력.
             ResultForm resultForm = MainForm.GetDockForm<ResultForm>();
             if (resultForm != null)
             {
@@ -193,6 +201,7 @@ namespace EOI.Inspect
         }
 
         //#INSP WORKER#3 각 알고리즘 타입 별로 검사에 필요한 데이터를 입력하는 함수
+        // 여기에 내가 필요한 알고리즘을 switch문 안에 추가하면 됨.
         private bool UpdateInspData(InspWindow inspWindow)
         {
             if (inspWindow is null)
@@ -208,7 +217,7 @@ namespace EOI.Inspect
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
 
-                InspectType inspType = inspAlgo.InspectType;
+                InspectType inspType = inspAlgo.InspectType; // InspectType에 본인이 만든 알고리즘이 있다면 추가하기
 
                 switch (inspType)
                 {
@@ -220,13 +229,28 @@ namespace EOI.Inspect
                             blobAlgo.SetInspData(srcImage);
                             break;
                         }
-
                     case InspectType.InspMatch:
                         {
                             MatchAlgorithm matchAlgo = (MatchAlgorithm)inspAlgo;
 
                             Mat srcImage = Global.Inst.InspStage.GetMat(0, matchAlgo.ImageChannel);
                             matchAlgo.SetInspData(srcImage);
+                            break;
+                        }
+                    case InspectType.PinHeaderCounter: // **추가**
+                        {
+                            PinHeaderCounter pinHeaderCounter = (PinHeaderCounter)inspAlgo;
+
+                            Mat srcImage = Global.Inst.InspStage.GetMat(0, pinHeaderCounter.ImageChannel);
+                            pinHeaderCounter.SetInspData(srcImage);
+                            break;
+                        }
+                    case InspectType.ICLeadCounter: // **추가** CHB
+                        {
+                            ICLeadCounter icLeadCounter = (ICLeadCounter)inspAlgo;
+
+                            Mat srcImage = Global.Inst.InspStage.GetMat(0, icLeadCounter.ImageChannel);
+                            icLeadCounter.SetInspData(srcImage);
                             break;
                         }
                     default:
@@ -239,7 +263,7 @@ namespace EOI.Inspect
 
             return true;
         }
-
+        //#HN#
         //#INSP WORKER#4 InspWindow내의 알고리즘 중에서, 인자로 입력된 알고리즘과 같거나,
         //인자가 None이면 모든 알고리즘의 검사 결과(Rect 영역)를 얻어, cameraForm에 출력한다.
         private bool DisplayResult(InspWindow inspObj, InspectType inspType)
@@ -265,14 +289,12 @@ namespace EOI.Inspect
 
             if (totalArea.Count > 0)
             {
-                //찾은 위치를 이미지상에서 표시
                 var cameraForm = MainForm.GetDockForm<CameraForm>();
                 if (cameraForm != null)
                 {
                     cameraForm.AddRect(totalArea);
                 }
             }
-
             return true;
         }
     }

@@ -93,9 +93,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
-    <Reference Include="System.Drawing.Common, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Drawing.Common.8.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
-    </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
@@ -125,8 +122,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\BlobAlgorithm.cs" />
+    <Compile Include="Algorithm\ICLeadCounter.cs" />
     <Compile Include="Algorithm\InspAlgorithm.cs" />
     <Compile Include="Algorithm\MatchAlgorithm.cs" />
+    <Compile Include="Algorithm\PinHeaderCounter.cs" />
     <Compile Include="CameraForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -194,11 +193,23 @@
     <Compile Include="Property\FilterInspProp.Designer.cs">
       <DependentUpon>FilterInspProp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Property\ICLeadCounterProp.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Property\ICLeadCounterProp.Designer.cs">
+      <DependentUpon>ICLeadCounterProp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Property\MatchInspProp.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Property\MatchInspProp.Designer.cs">
       <DependentUpon>MatchInspProp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Property\PinHeaderCounterProp.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Property\PinHeaderCounterProp.Designer.cs">
+      <DependentUpon>PinHeaderCounterProp.cs</DependentUpon>
     </Compile>
     <Compile Include="ResultForm.cs">
       <SubType>Form</SubType>
@@ -289,6 +300,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Property\MatchInspProp.resx">
       <DependentUpon>MatchInspProp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Property\PinHeaderCounterProp.resx">
+      <DependentUpon>PinHeaderCounterProp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ResultForm.resx">
       <DependentUpon>ResultForm.cs</DependentUpon>

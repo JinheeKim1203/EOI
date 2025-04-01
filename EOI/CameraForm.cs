@@ -21,6 +21,9 @@ namespace EOI
 {
     public partial class CameraForm : DockContent
     {
+        //#HN#
+        public ImageViewCCtrl ImageViewCCtrl { get; set; }
+
         //# SAVE ROI#1 현재 선택된 이미지 채널 저장을 위한 변수
         eImageChannel _currentImageChannel = eImageChannel.Color;
 
@@ -47,10 +50,10 @@ namespace EOI
                     Global.Inst.InspStage.TryInspection(e.InspWindow);
                     break;
                 case EntityActionType.Add:
-                    Global.Inst.InspStage.AddInspWindow(e.WindowType, e.Rect);
+                    Global.Inst.InspStage.AddInspWindow(e.WindowType, e.Rect); // ROI 추가(여기서 ROI의 타입, 해당 ROI에 적용되는 알고리즘 수정 가능)
                     break;
                 case EntityActionType.Move:
-                    Global.Inst.InspStage.MoveInspWindow(e.InspWindow, e.OffsetMove);
+                    Global.Inst.InspStage.MoveInspWindow(e.InspWindow, e.OffsetMove); // ROI 이동
                     break;
                 case EntityActionType.Resize:
                     Global.Inst.InspStage.ModifyInspWindow(e.InspWindow, e.Rect);
@@ -97,7 +100,7 @@ namespace EOI
             return eImageChannel.Color;
         }
 
-        public void UpdateDisplay(Bitmap bitmap = null)
+        public void UpdateDisplay(Bitmap bitmap = null) // 이 부분이 오류가 난다면 참조에서 System.Drawing.Common을 제거하면 됨. System.Drawing이랑 충돌나서 그럼.
         {
             if (bitmap == null)
             {
@@ -224,7 +227,7 @@ namespace EOI
                             EntityROI = new Rectangle(
                                 member.WindowArea.X, member.WindowArea.Y,
                                 member.WindowArea.Width, member.WindowArea.Height),
-                            EntityColor = imageViewer.GetWindowColor(member.InspWindowType),
+                            EntityColor = ImageViewCCtrl.GetWindowColor(member.InspWindowType),
                             IsHold = member.IsTeach,
                         };
                         diagramEntityList.Add(entity);
@@ -232,13 +235,16 @@ namespace EOI
                 }
                 else if (window.Parent == null)
                 {
-                    DiagramEntity entity = new DiagramEntity()
+                    DiagramEntity entity = new DiagramEntity() //#HN#->WindowArea를 InspArea로 바꿈
                     {
                         LinkedWindow = window,
                         EntityROI = new Rectangle(
-                            window.WindowArea.X, window.WindowArea.Y,
+                            window.InspArea.X, window.InspArea.Y,
                                 window.WindowArea.Width, window.WindowArea.Height),
-                        EntityColor = imageViewer.GetWindowColor(window.InspWindowType),
+                        //EntityROI = new Rectangle(
+                        //    window.InspArea.X, window.InspArea.Y,
+                        //        window.InspArea.Width, window.InspArea.Height),
+                        EntityColor = ImageViewCCtrl.GetWindowColor(window.InspWindowType),
                         IsHold = window.IsTeach
                     };
                     diagramEntityList.Add(entity);

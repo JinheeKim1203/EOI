@@ -63,11 +63,11 @@ namespace EOI.Teach
         }
 
         //그룹내 모든 윈도우 검사
-        public override bool DoInpsect(InspectType inspType)
+        public override bool DoInspect(InspectType inspType)
         {
             foreach (var window in Members)
             {
-                window.DoInpsect(inspType);
+                window.DoInspect(inspType);
             }
             return true;
         }

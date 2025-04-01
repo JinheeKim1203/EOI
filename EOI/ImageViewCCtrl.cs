@@ -52,7 +52,7 @@ namespace EOI
     {
         //#MULTI ROI#2 ROI를 추가,수정,삭제 등으로 변경 시, 이벤트 발생
         public event EventHandler<DiagramEntityEventArgs> DiagramEntityEvent;
-
+        //ROI 그리기: 시작점
         private Point _roiStart = Point.Empty;
         private Rectangle _roiRect = Rectangle.Empty;
         private bool _isSelectingRoi = false;
@@ -87,7 +87,7 @@ namespace EOI
         private const float MaxZoom = 100.0f;
 
         //#MATCH PROP#11 템플릿 매칭 결과 출력을 위해 Rectangle 리스트 변수 설정
-        private List<Rectangle> _rectangles = new List<Rectangle>();
+        private List<Rectangle> _rectangles = new List<Rectangle>(); // 검사 결과 Rect
 
         //#MULTI ROI#5 수정에 필요한 타입 추가
 
@@ -142,7 +142,7 @@ namespace EOI
         }
 
         //#MULTI ROI#6 InspWindow 타입에 따른, 칼라 정보 얻는 함수
-        public Color GetWindowColor(InspWindowType inspWindowType)
+        public static Color GetWindowColor(InspWindowType inspWindowType)
         {
             Color color = Color.LightBlue;
 
@@ -166,8 +166,11 @@ namespace EOI
                 case InspWindowType.Chip:
                     color = Color.Orange;
                     break;
-                case InspWindowType.Pad:
+                case InspWindowType.PinHeaderCount: // **수정** 2025.03.31 CHB
                     color = Color.Yellow;
+                    break;
+                case InspWindowType.ICLeadCount: // **추가** CHB
+                    color = Color.Red;
                     break;
             }
 
@@ -325,7 +328,7 @@ namespace EOI
         //    }
         //}
         #endregion
-
+        //#HN#
         // Windows Forms에서 컨트롤이 다시 그려질 때 자동으로 호출되는 메서드
         // 화면새로고침(Invalidate()), 창 크기변경, 컨트롤이 숨겨졌다가 나타날때 실행
         protected override void OnPaint(PaintEventArgs e)
@@ -334,40 +337,50 @@ namespace EOI
 
             if (_bitmapImage != null && Canvas != null)
             {
-                // 캔버스를 초기화하고 이미지 그리기
-                using (Graphics g = Graphics.FromImage(Canvas))  // 메모리누수방지
+                using (Graphics g = Graphics.FromImage(Canvas))
                 {
-                    g.Clear(Color.Transparent); // 배경을 투명하게 설정
-
-                    //이미지 확대or축소때 화질 최적화 방식(Interpolation Mode) 설정                    
+                    g.Clear(Color.Transparent);
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
                     g.DrawImage(_bitmapImage, ImageRect);
 
-                    /* Interpolation Mode********************************************
-                     * NearestNeighbor	빠르지만 품질이 낮음 (픽셀이 깨질 수 있음)
-                     * Bicubic	Bilinear보다 더 부드러움, 그러나 속도가 느릴 수 있음
-                     * HighQualityBicubic	가장 부드럽고 고품질, 그러나 가장 느림
-                     * HighQualityBilinear	Bilinear보다 품질이 높고 Bicubic보다 빠름
-                     ****************************************************************/
-
-                    //#MATCH PROP#12 템플릿 매칭 위치 그리기
-
-                    // 이미지 좌표 → 화면 좌표 변환 후 사각형 그리기
-                    if (_rectangles != null)
+                    if (_rectangles != null && _rectangles.Count > 0)
                     {
-                        using (Pen pen = new Pen(Color.LightCoral, 2))
+                        using (Pen resultPen = new Pen(Color.LightCoral, 2))
                         {
                             foreach (var rect in _rectangles)
                             {
                                 Rectangle screenRect = VirtualToScreen(rect);
-                                g.DrawRectangle(pen, screenRect);
+                                g.DrawRectangle(resultPen, screenRect); //결과 영역 표시
+                            }
+                        }
+                    }
+                    //#HN#
+                    //여기 추가했더니 여러 ROI에 대해 각rect가 생성되고 align됨
+                    foreach (var entity in _diagramEntityList)
+                    {
+                        InspWindow window = entity.LinkedWindow;
+                        if (window == null || window.InspResultList == null)
+                            continue;
+
+                        foreach (var result in window.InspResultList)
+                        {
+                            if (result.ResultRectList == null)
+                                continue;
+
+                            foreach (var rect in result.ResultRectList)
+                            {
+                                Rectangle screenRect = VirtualToScreen(new Rectangle(rect.X, rect.Y, rect.Width, rect.Height));
+                                using (Pen pen = new Pen(Color.Red, 2))
+                                {
+                                    g.DrawRectangle(pen, screenRect);
+                                }
                             }
                         }
                     }
 
-                    //#MULTI ROI#8 여러개 ROI를 그려주는 코드
-                    //#GROUP ROI#8 멀티ROI 처리
                     _screenSelectedRect = new Rectangle(0, 0, 0, 0);
+                    //EntityROI는 티칭된 ROI
+                    //InspResult.ResultRectList는 검사 결과로 얻어진 Rect
                     foreach (DiagramEntity entity in _diagramEntityList)
                     {
                         Rectangle screenRect = VirtualToScreen(entity.EntityROI);
@@ -378,29 +391,20 @@ namespace EOI
                                 pen.DashStyle = DashStyle.Dash;
                                 pen.Width = 2;
 
-                                if (_screenSelectedRect.IsEmpty)
-                                {
-                                    _screenSelectedRect = screenRect;
-                                }
-                                else
-                                {
-                                    //선택된 roi가 여러개 일때, 전체 roi 영역 계산
-                                    //선택된 roi 영역 합치기
-                                    _screenSelectedRect = Rectangle.Union(_screenSelectedRect, screenRect);
-                                }
+                                _screenSelectedRect = _screenSelectedRect.IsEmpty
+                                    ? screenRect
+                                    : Rectangle.Union(_screenSelectedRect, screenRect);
                             }
 
-                            g.DrawRectangle(pen, screenRect);
+                            g.DrawRectangle(pen, screenRect); //ROI 그리는 핵심
                         }
 
-                        //선택된 ROI가 있다면, 리사이즈 핸들 그리기
                         if (_multiSelectedEntities.Count <= 1 && entity == _selEntity)
                         {
-                            // 리사이즈 핸들 그리기 (8개 포인트: 4 모서리 + 4 변 중간)
                             using (Brush brush = new SolidBrush(Color.LightBlue))
                             {
-                                Point[] resizeHandles = GetResizeHandles(screenRect);
-                                foreach (Point handle in resizeHandles)
+                                Point[] handles = GetResizeHandles(screenRect);
+                                foreach (var handle in handles)
                                 {
                                     g.FillRectangle(brush, handle.X - _ResizeHandleSize / 2, handle.Y - _ResizeHandleSize / 2, _ResizeHandleSize, _ResizeHandleSize);
                                 }
@@ -408,7 +412,6 @@ namespace EOI
                         }
                     }
 
-                    //#GROUP ROI#9 선택된 개별 roi가 없고, 여러개가 선택되었다면
                     if (_multiSelectedEntities.Count > 1 && !_screenSelectedRect.IsEmpty)
                     {
                         using (Pen pen = new Pen(Color.White, 2))
@@ -416,18 +419,16 @@ namespace EOI
                             g.DrawRectangle(pen, _screenSelectedRect);
                         }
 
-                        // 리사이즈 핸들 그리기 (8개 포인트: 4 모서리 + 4 변 중간)
                         using (Brush brush = new SolidBrush(Color.LightBlue))
                         {
-                            Point[] resizeHandles = GetResizeHandles(_screenSelectedRect);
-                            foreach (Point handle in resizeHandles)
+                            Point[] handles = GetResizeHandles(_screenSelectedRect);
+                            foreach (var handle in handles)
                             {
                                 g.FillRectangle(brush, handle.X - _ResizeHandleSize / 2, handle.Y - _ResizeHandleSize / 2, _ResizeHandleSize, _ResizeHandleSize);
                             }
                         }
                     }
 
-                    //#MULTI ROI#9 신규 ROI 추가할때, 해당 ROI 그리기
                     if (_isSelectingRoi && !_roiRect.IsEmpty)
                     {
                         Rectangle rect = VirtualToScreen(_roiRect);
@@ -439,11 +440,9 @@ namespace EOI
 
                     if (_multiSelectedEntities.Count <= 1 && _selEntity != null)
                     {
-                        //확장영역이 있다면 표시
                         DrawInspParam(g, _selEntity.LinkedWindow);
                     }
 
-                    //#GROUP ROI#10 선택 영역 박스 그리기
                     if (_isBoxSelecting && !_selectionBox.IsEmpty)
                     {
                         using (Pen pen = new Pen(Color.LightSkyBlue, 3))
@@ -454,8 +453,7 @@ namespace EOI
                         }
                     }
 
-                    // 캔버스를 UserControl 화면에 표시
-                    e.Graphics.DrawImage(Canvas, 0, 0);
+                    e.Graphics.DrawImage(Canvas, 0, 0); //rect가 그려지는 코드
                 }
             }
         }
@@ -464,7 +462,7 @@ namespace EOI
         {
             if (window is null)
                 return;
-
+            //매칭 확장 영역 표시 (MatchAlgorithm 사용)
             MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);
             if (matchAlgo != null)
             {
@@ -604,6 +602,8 @@ namespace EOI
                 //ROI 위치 이동
                 else if (_isMovingRoi)
                 {
+                    //화면 좌표계에서 마우스를 얼마나 이동했는지 계산한 뒤 Virtual 좌표계로 변환
+                    //이 좌표 이동값 (dxVirtual, dyVirtual)이 Align 계산 시 offset 이동량
                     int dx = e.X - _moveStart.X;
                     int dy = e.Y - _moveStart.Y;
 
@@ -707,6 +707,7 @@ namespace EOI
                     //모델에 InspWindow 크기 변경 이벤트 발생
                     DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Resize, _selEntity.LinkedWindow, _newRoiType, _roiRect, new Point()));
                 }
+                //#HN#
                 else if (_isMovingRoi)
                 {
                     _isMovingRoi = false;
@@ -720,17 +721,42 @@ namespace EOI
                         {
                             offsetMove.X = _selEntity.EntityROI.X - linkedWindow.WindowArea.X;
                             offsetMove.Y = _selEntity.EntityROI.Y - linkedWindow.WindowArea.Y;
+
+                            // 기준 ROI 외의 다른 ROI도 같이 이동
+                            foreach (DiagramEntity entity in _diagramEntityList)
+                            {
+                                if (entity == _selEntity || entity.IsHold)
+                                    continue;
+
+                                Rectangle roi = entity.EntityROI;
+                                roi.Offset(offsetMove);
+                                entity.EntityROI = roi;
+
+                                if (entity.LinkedWindow != null)
+                                    _selEntity.LinkedWindow.WindowArea = new OpenCvSharp.Rect(
+                                        _selEntity.EntityROI.X,
+                                        _selEntity.EntityROI.Y,
+                                        _selEntity.EntityROI.Width,
+                                        _selEntity.EntityROI.Height); 
+                            }
                         }
 
                         //모델에 InspWindow 이동 이벤트 발생
                         if (offsetMove.X != 0 || offsetMove.Y != 0)
-                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove));
+                        {
+                            DiagramEntityEvent?.Invoke(this,
+                                new DiagramEntityEventArgs(EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove));
+                        }
                         else
-                            //모델에 InspWindow 선택 변경 이벤트 발생
-                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow));
+                        {
+                            DiagramEntityEvent?.Invoke(this,
+                                new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow));
+                        }
+                        Invalidate(); // 변경된 ROI 위치를 다시 화면에 그리기
 
                     }
                 }
+
                 // ROI 선택 완료
                 if (_isBoxSelecting)
                 {
@@ -935,7 +961,7 @@ namespace EOI
         public void AddRect(List<Rectangle> rectangles)
         {
             _rectangles = rectangles;
-            Invalidate();
+            Invalidate();  // 다시 그리기
         }
 
         //#GROUP ROI#14 키보드 이벤트 받기 
@@ -975,12 +1001,23 @@ namespace EOI
             base.OnKeyUp(e);
         }
 
+        //#HN#
         public bool SetDiagramEntityList(List<DiagramEntity> diagramEntityList)
         {
-            //작은 roi가 먼저 선택되도록, 소팅
             _diagramEntityList = diagramEntityList
-                                .OrderBy(r => r.EntityROI.Width * r.EntityROI.Height)
-                                .ToList();
+        .OrderBy(r => r.EntityROI.Width * r.EntityROI.Height)
+        .ToList();
+
+            // 👇 여기 추가!
+            foreach (var entity in _diagramEntityList)
+            {
+                if (entity.LinkedWindow != null)
+                {
+                    entity.LinkedWindow.WindowArea = new OpenCvSharp.Rect(
+                        entity.EntityROI.X, entity.EntityROI.Y,
+                        entity.EntityROI.Width, entity.EntityROI.Height);
+                }
+            }
 
             _selEntity = null;
             Invalidate();

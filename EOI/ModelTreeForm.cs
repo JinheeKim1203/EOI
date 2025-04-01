@@ -41,9 +41,9 @@ namespace EOI
             _contextMenu = new ContextMenuStrip();
 
             List<InspWindowType> windowTypeList;
-            if (MachineType.SMT == SettingXml.Inst.MachineType)
+            if (MachineType.SMT == SettingXml.Inst.MachineType) // **수정** 2025.03.31 CHB
             {
-                windowTypeList = new List<InspWindowType> { InspWindowType.Package, InspWindowType.Chip, InspWindowType.Pad, InspWindowType.ID };
+                windowTypeList = new List<InspWindowType> { InspWindowType.Package, InspWindowType.Chip, InspWindowType.PinHeaderCount, InspWindowType.ID, InspWindowType.ICLeadCount };
             }
             else
             {
@@ -92,7 +92,16 @@ namespace EOI
         //#MODEL#14 현재 모델 전체의 ROI를 트리 모델에 업데이트
         public void UpdateDiagramEntity()
         {
+            //#HN# ->WinForms의 모든 UI 컨트롤은 **자신이 생성된 스레드(UI 스레드)**에서만 접근해야 하는데 다른 스레드로 실행되고 있는 코드가 tvModelTree를 조작하려 했기 때문에 예외가 발생 
+            if (tvModelTree.InvokeRequired)
+            {
+                tvModelTree.Invoke(new MethodInvoker(UpdateDiagramEntity));
+                return;
+            }
+
+            // tvModelTree는 이제 UI 스레드에서 안전하게 접근 가능
             tvModelTree.Nodes.Clear();
+            // ... 기타 작업
             TreeNode rootNode = tvModelTree.Nodes.Add("Root");
 
             Model model = Global.Inst.InspStage.CurModel;
