@@ -1092,32 +1092,41 @@ namespace EOI
 
         private void OnUpdateImageClicked(object sender, EventArgs e)
         {
-            if (_selEntity is null)
+            if (_bitmapImage == null || _diagramEntityList == null)
                 return;
 
-            InspWindow window = _selEntity.LinkedWindow;
-
-            if (window is null)
+            var selectedEntities = _multiSelectedEntities.Count > 0 ? _multiSelectedEntities : (_selEntity != null ? new List<DiagramEntity> { _selEntity } : null);
+            if (selectedEntities == null)
                 return;
 
-            // 🔥 1. 현재 ROI 사각형 가져오기
-            Rectangle roi = _selEntity.EntityROI;
+            int addedCount = 0;
 
-            // 🔥 2. ROI 영역을 크롭해서 Bitmap 생성
-            Bitmap cropped = new Bitmap(roi.Width, roi.Height);
-            using (Graphics g = Graphics.FromImage(cropped))
+            foreach (var entity in selectedEntities)
             {
-                g.DrawImage(_bitmapImage,
-                    new Rectangle(0, 0, roi.Width, roi.Height), // 대상
-                    roi, // 원본의 이 영역을
-                    GraphicsUnit.Pixel);
+                if (entity?.LinkedWindow is InspWindow window)
+                {
+                    Rectangle roi = entity.EntityROI;
+                    if (roi.Width <= 0 || roi.Height <= 0)
+                        continue;
+
+                    // ✅ ROI 영역을 크롭해서 TeachImageList에 추가
+                    Bitmap cropped = new Bitmap(roi.Width, roi.Height);
+                    using (Graphics g = Graphics.FromImage(cropped))
+                    {
+                        g.DrawImage(_bitmapImage,
+                            new Rectangle(0, 0, roi.Width, roi.Height),
+                            roi,
+                            GraphicsUnit.Pixel);
+                    }
+
+                    window.TeachImageList.Insert(0, cropped); // 최신 이미지 앞에 추가
+                    SLogger.Write($"✅ UID {window.UID} 티칭 이미지 추가됨");
+                    addedCount++;
+                }
             }
 
-            // 🔥 3. TeachImageList에 추가
-            window.TeachImageList.Insert(0, cropped); ;
-
-            // 💬 4. 알림 또는 로그 출력
-            SLogger.Write("티칭 이미지가 TeachImageList에 추가되었습니다.");
+            if (addedCount > 0)
+                SLogger.Write($"{addedCount}개의 ROI 티칭 이미지가 추가되었습니다.");
         }
 
         private void OnUnlockClicked(object sender, EventArgs e)
