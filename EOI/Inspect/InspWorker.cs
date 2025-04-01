@@ -104,7 +104,7 @@ namespace EOI.Inspect
             {
                 Global.Inst.InspStage.OneCycle();
 
-                //Thread.Sleep(200); // 주기 설정
+                Thread.Sleep(700); // 2025.04.01 **수정** 주기 설정 (검사 시간 텀 설정)
             }
         }
 

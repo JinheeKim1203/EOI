@@ -577,7 +577,9 @@ namespace EOI.Core
             if (isCycle)
                 _inspWorker.StartCycleInspectImage();
             else
+            {               
                 OneCycle();
+            }            
         }
 
         public bool OneCycle()
@@ -594,10 +596,10 @@ namespace EOI.Core
             }
 
             if (!_inspWorker.RunInspect()) // 무조건적으로 검사가 끝나고 난 후 이미지가 나오게 실행. (Contour한정)
-                return false;
-           
+                return false;            
 
             UpdateProperty(CurModel.InspWindowList[0]);// **추가** 검사 결과를 바로 확인하기 위해 추가 2025.03.31
+            
 
             return true;
         }

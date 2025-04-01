@@ -50,7 +50,16 @@ namespace EOI.Property
 
         public void SetResult()
         {
-            lblStatus.Text = _pinHeaderCounter.result;
+            // 안전하게 UI 스레드에서 실행
+            if (lblStatus.InvokeRequired)
+            {
+                lblStatus.Invoke(new Action(() => lblStatus.Text = _pinHeaderCounter.result));
+            }
+            else
+            {
+                lblStatus.Text = _pinHeaderCounter.result; ;
+            }
+            //lblStatus.Text = _pinHeaderCounter.result;
         }
     }
 }
