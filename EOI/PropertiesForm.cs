@@ -81,6 +81,38 @@ namespace EOI
             _allTabs[tabName] = newTab;
         }
 
+        // **jh
+        private void LoadDualOptionControl(InspectType topType, InspectType bottomType)
+        {
+            string tabName = $"{topType}_{bottomType}";
+
+            // 이미 생성된 듀얼 탭이면 패스
+            foreach (TabPage tabPage in tabPropControl.TabPages)
+            {
+                if (tabPage.Text == tabName)
+                    return;
+            }
+
+            var topControl = CreateUserControl(topType);       // PinHeaderCounterProp
+            var bottomControl = CreateUserControl(bottomType); // MatchInspProp
+
+            if (topControl == null || bottomControl == null)
+                return;
+
+            TabPage newTab = new TabPage(tabName);
+
+            // 도킹 순서 중요: Fill 먼저, Top 나중
+            bottomControl.Dock = DockStyle.Fill;
+            topControl.Dock = DockStyle.Top;
+            topControl.Height = 275;
+
+            newTab.Controls.Add(bottomControl);
+            newTab.Controls.Add(topControl);
+
+            tabPropControl.TabPages.Insert(0, newTab);
+            tabPropControl.SelectedTab = newTab;
+        }
+
         //#PANEL TO TAB#2 속성탭 타입에 맞게 UseControl 생성하여 반환
         private UserControl CreateUserControl(InspectType inspPropType)
         {
@@ -120,11 +152,26 @@ namespace EOI
             return _inspProp;
         }
         
+        // **jh
         public void ShowProperty(InspWindow window)
         {
+            bool hasMatch = false;
+            bool hasPinHeader = false;
+
             foreach (InspAlgorithm algo in window.AlgorithmList)
             {
-                LoadOptionControl(algo.InspectType);
+                if (algo.InspectType == InspectType.InspMatch)
+                    hasMatch = true;
+                else if (algo.InspectType == InspectType.PinHeaderCounter)
+                    hasPinHeader = true;
+                else
+                    LoadOptionControl(algo.InspectType); // 일반 단일 컨트롤 탭 생성
+            }
+
+            if (hasMatch || hasPinHeader)
+            {
+                // Match와 PinHeader 둘 중 하나라도 있으면 듀얼 탭 한 번 생성
+                LoadDualOptionControl(InspectType.PinHeaderCounter, InspectType.InspMatch);
             }
 
             tabPropControl.SelectedIndex = 0;
@@ -135,6 +182,7 @@ namespace EOI
             tabPropControl.TabPages.Clear();
         }
 
+        // **jh
         public void UpdateProperty(InspWindow window)
         {
             if (window is null)
@@ -142,42 +190,49 @@ namespace EOI
 
             foreach (TabPage tabPage in tabPropControl.TabPages)
             {
-                if (tabPage.Controls.Count > 0)
+                // 듀얼 탭일 경우: 컨트롤이 2개 있음
+                if (tabPage.Controls.Count == 2)
+                {
+                    var bottomUC = tabPage.Controls[0] as UserControl; // Fill
+                    var topUC = tabPage.Controls[1] as UserControl;    // Top
+
+                    if (topUC is PinHeaderCounterProp pinHeaderProp)
+                    {
+                        var algo = window.FindInspAlgorithm(InspectType.PinHeaderCounter) as PinHeaderCounter;
+                        if (algo != null)
+                            pinHeaderProp.SetAlgorithm(algo);
+                    }
+
+                    if (bottomUC is MatchInspProp matchProp)
+                    {
+                        var algo = window.FindInspAlgorithm(InspectType.InspMatch) as MatchAlgorithm;
+                        if (algo != null)
+                            matchProp.SetAlgorithm(algo);
+                    }
+                }
+                // 일반 단일 탭
+                else if (tabPage.Controls.Count == 1)
                 {
                     UserControl uc = tabPage.Controls[0] as UserControl;
 
                     if (uc is MatchInspProp matchProp)
                     {
-                        MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);
-                        if (matchAlgo is null)
-                            continue;
-
-                        matchProp.SetAlgorithm(matchAlgo);
+                        var algo = window.FindInspAlgorithm(InspectType.InspMatch) as MatchAlgorithm;
+                        if (algo != null)
+                            matchProp.SetAlgorithm(algo);
                     }
                     else if (uc is BinaryInspProp binaryProp)
                     {
-                        BlobAlgorithm blobAlgo = (BlobAlgorithm)window.FindInspAlgorithm(InspectType.InspBinary);
-                        if (blobAlgo is null)
-                            continue;
-
-                        binaryProp.SetAlgorithm(blobAlgo);
+                        var algo = window.FindInspAlgorithm(InspectType.InspBinary) as BlobAlgorithm;
+                        if (algo != null)
+                            binaryProp.SetAlgorithm(algo);
                     }
-                    else if (uc is PinHeaderCounterProp pinHeaderCounterProp) // **추가**
+                    else if (uc is PinHeaderCounterProp pinHeaderProp)
                     {
-                        PinHeaderCounter pinHeaderCounterAlgo = (PinHeaderCounter)window.FindInspAlgorithm(InspectType.PinHeaderCounter);
-                        if (pinHeaderCounterAlgo is null)
-                            continue;
-
-                        pinHeaderCounterProp.SetAlgorithm(pinHeaderCounterAlgo);
+                        var algo = window.FindInspAlgorithm(InspectType.PinHeaderCounter) as PinHeaderCounter;
+                        if (algo != null)
+                            pinHeaderProp.SetAlgorithm(algo);
                     }
-                    //else if (uc is ICLeadCounterProp icLeadCounterProp) // **추가**
-                    //{
-                    //    ICLeadCounterAlgorithm icLeadCounterAlgo = (ICLeadCounterAlgorithm)window.FindInspAlgorithm(InspectType.ICLeadCounter);
-                    //    if (icLeadCounterAlgo is null)
-                    //        continue;
-
-                    //    icLeadCounterProp.SetAlgorithm(icLeadCounterAlgo);
-                    //}
                 }
             }
         }
