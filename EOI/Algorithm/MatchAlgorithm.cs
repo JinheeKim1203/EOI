@@ -294,10 +294,16 @@ namespace EOI.Algorithm
             int halfWidth = _templateImage.Width;
             int halfHeight = _templateImage.Height;
 
-            foreach (var point in OutPoints)
+            //#HN# ->함수 내에서 List<T>를 foreach 또는 for문으로 순회 중인데, 다른 스레드 또는 이 루프 안에서 해당 리스트(resultArea)를 수정(추가/삭제/클리어 등) 해서 오류 수정
+            var safeOutPoints = OutPoints.ToList(); // 복사본 만들기
+
+            lock (resultArea)
             {
-                SLogger.Write($"매칭된 위치: {OutPoints}");
-                resultArea.Add(new Rect(point.X, point.Y, _templateImage.Width, _templateImage.Height));
+                foreach (var pt in safeOutPoints)
+                {
+                    SLogger.Write($"매칭된 위치: {pt}");
+                    resultArea.Add(new Rect(pt.X, pt.Y, _templateImage.Width, _templateImage.Height));
+                }
             }
 
             return resultArea.Count;

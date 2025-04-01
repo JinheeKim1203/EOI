@@ -55,29 +55,47 @@ namespace EOI.Algorithm
             if (_srcImage == null)
                 return false;
 
-            Mat targetImage = _srcImage[InspRect];
+            //#HN# -> InspRect를 조정하여 안전한 Rect 생성
 
+            int imageWidth = _srcImage.Width;
+            int imageHeight = _srcImage.Height;
+
+
+            Rect safeRect = InspRect;
+
+            if (safeRect.X < 0) safeRect.X = 0;
+            if (safeRect.Y < 0) safeRect.Y = 0;
+            if (safeRect.Right > imageWidth)
+                safeRect.Width = imageWidth - safeRect.X;
+            if (safeRect.Bottom > imageHeight)
+                safeRect.Height = imageHeight - safeRect.Y;
+
+            // 안전한 ROI 생성
+            Mat targetImage = new Mat(_srcImage, safeRect);
+
+            // 그레이스케일 변환
             Mat grayImage = new Mat();
             if (targetImage.Type() == MatType.CV_8UC3)
                 Cv2.CvtColor(targetImage, grayImage, ColorConversionCodes.BGR2GRAY);
             else
                 grayImage = targetImage;
 
+            // 이진화
             Mat binaryImage = new Mat();
-            //Cv2.Threshold(grayImage, binaryMask, lowerValue, upperValue, ThresholdTypes.Binary);
             Cv2.InRange(grayImage, BinThreshold.lower, BinThreshold.upper, binaryImage);
 
             if (BinThreshold.invert)
                 binaryImage = ~binaryImage;
 
+            // Blob 필터링 조건 검사
             if (AreaMin > 0 || AreaMax > 0 || WidthMin > 0 || WidthMax > 0 || HeightMin > 0 || HeightMax > 0)
             {
                 if (!BlobFilter(binaryImage, AreaMin, AreaMax, WidthMin, WidthMax, HeightMin, HeightMax))
                     return false;
             }
 
+            // 검사 완료
             IsInspected = true;
-
             return true;
         }
 
