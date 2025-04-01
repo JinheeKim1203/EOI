@@ -13,6 +13,7 @@ using EOI.Setting;
 using System.Xml.Linq;
 using EOI.Inspect;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace EOI.Teach
 {
@@ -74,6 +75,10 @@ namespace EOI.Teach
         [XmlIgnore]
         public Mat WindowImage { get; set; }
 
+        // **jh ✅ 티칭 이미지 리스트 (이미지뷰에서 ROI 크롭 후 저장되는 리스트)
+        [XmlIgnore]
+        public List<Bitmap> TeachImageList { get; set; } = new List<Bitmap>();
+
         public bool IsPatternLearn { get; set; } = false;
 
         public InspWindow()
@@ -90,6 +95,13 @@ namespace EOI.Teach
         {
             _teachingImage = new Mat(image, new Rect(rect.X, rect.Y, rect.Width, rect.Height));
             return true;
+        }
+
+        // **jh ✅ TeachImageList에 이미지 추가
+        public void AddTeachImage(Bitmap bitmap)
+        {
+            if (bitmap == null) return;
+            TeachImageList.Add(new Bitmap(bitmap)); // 깊은 복사로 추가
         }
 
         //#MATCH PROP#4 템플릿 매칭 이미지 로딩
@@ -279,17 +291,15 @@ namespace EOI.Teach
                 }
             }
 
-            // ✅ 마지막으로 현재 WindowImage 저장 (맨 뒤로 추가)
-            if (WindowImage != null)
+            // ** jh ✅ TeachImageList 저장 (UID_T001.png, UID_T002.png ...) 기존의 바로 저장방식은 삭제
+            if (TeachImageList != null && TeachImageList.Count > 0)
             {
-                string uid = UID;
-
-                // 저장된 파일 개수 파악
-                var files = Directory.GetFiles(imgDir, $"{uid}_T*.png");
-                int nextIndex = files.Length + 1;
-
-                string targetPath = Path.Combine(imgDir, $"{uid}_T{nextIndex:D3}.png");
-                Cv2.ImWrite(targetPath, WindowImage);
+                for (int i = 0; i < TeachImageList.Count; i++)
+                {
+                    string fileName = $"{UID}_T{i + 1:D3}.png";
+                    string savePath = Path.Combine(imgDir, fileName);
+                    TeachImageList[i].Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
+                }
             }
 
             return true;
@@ -302,31 +312,46 @@ namespace EOI.Teach
 
             string imgDir = Path.Combine(Path.GetDirectoryName(curModel.ModelPath), "Images");
 
+            TeachImageList = new List<Bitmap>();  // ** jh ✅ 새로 초기화
+
+            // ✅ 이미지 리스트 로딩 (UID_T*.png)
+            var files = Directory.GetFiles(imgDir, $"{UID}_T*.png")
+                                 .OrderBy(f => f)  // 정렬: T001, T002 순
+                                 .ToList();
+
+            foreach (var file in files)
+            {
+                try
+                {
+                    using (var bmp = new Bitmap(file))
+                    {
+                        TeachImageList.Add(new Bitmap(bmp));  // 복사본 저장
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"이미지 로딩 실패: {file}\n{ex.Message}");
+                }
+            }
+
+            // ✅ 대표 WindowImage 설정
+            if (TeachImageList.Count > 0)
+            {
+                WindowImage = OpenCvSharp.Extensions.BitmapConverter.ToMat(TeachImageList[0]);
+            }
+
+            // ✅ MatchAlgorithm의 템플릿 이미지로 설정
             foreach (InspAlgorithm algo in AlgorithmList)
             {
-                if (algo is null)
-                    continue;
-
-                if (algo.InspectType == InspectType.InspMatch)
+                if (algo is MatchAlgorithm matchAlgo && WindowImage != null)
                 {
-                    MatchAlgorithm matchAlgo = algo as MatchAlgorithm;
-                    string targetPath = Path.Combine(imgDir, UID + ".png");
-                    if (File.Exists(targetPath))
-                    {
-                        Mat windowImage = Cv2.ImRead(targetPath);
-                        if (windowImage != null)
-                        {
-                            WindowImage = windowImage;
+                    Mat gray = new Mat();
+                    if (WindowImage.Type() == MatType.CV_8UC3)
+                        Cv2.CvtColor(WindowImage, gray, ColorConversionCodes.BGR2GRAY);
+                    else
+                        gray = WindowImage;
 
-                            Mat tempImage = new Mat();
-                            if (windowImage.Type() == MatType.CV_8UC3)
-                                Cv2.CvtColor(windowImage, tempImage, ColorConversionCodes.BGR2GRAY);
-                            else
-                                tempImage = windowImage;
-
-                            matchAlgo.SetTemplateImage(tempImage);
-                        }
-                    }
+                    matchAlgo.SetTemplateImage(gray);
                 }
             }
 

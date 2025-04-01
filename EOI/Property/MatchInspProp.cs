@@ -139,10 +139,48 @@ namespace EOI.Property
 
             string imgDir = Path.Combine(Path.GetDirectoryName(modelPath), "Images");
 
+            // 2️⃣ TeachImageList에만 있는 "New" 이미지 표시
+            //var savedPaths = new HashSet<string>(files); // 빠른 검색용
+
+            var teachList = _matchAlgo?.LinkedWindow?.TeachImageList;
+            if (teachList != null)
+            {
+                int newIndex = 0;
+                foreach (var bmp in teachList)
+                {
+                    // TeachImageList 중 실제 파일로 저장된 것 제외
+                    string expectedPath = Path.Combine(imgDir, $"{uid}_T{newIndex + 1:D3}.png");
+                    if (File.Exists(expectedPath))
+                    {
+                        newIndex++;
+                        continue; // 저장된 파일은 위에서 이미 처리됨
+                    }
+
+                    PictureBox newThumb = new PictureBox();
+                    newThumb.Image = new Bitmap(bmp); // 복사본 사용
+                    newThumb.SizeMode = PictureBoxSizeMode.Zoom;
+                    newThumb.Size = new System.Drawing.Size(60, 60);
+                    newThumb.Margin = new Padding(5);
+                    newThumb.Cursor = Cursors.Hand;
+                    newThumb.Tag = null; // 파일 경로 없음
+
+                    // 🟧 새로 추가된 이미지는 주황색 테두리
+                    newThumb.BorderStyle = BorderStyle.FixedSingle;
+                    newThumb.BackColor = Color.LightGreen;
+                    newThumb.Tag = "new";
+
+                    newThumb.Click += OnTeachThumbnailClick;
+                    flwTeachList.Controls.Add(newThumb);
+
+                    newIndex++;
+                }
+            }
+
             // ⛔ ROI가 없어도 Images 폴더는 없을 수 있음.없으면 그냥 return
             if (!Directory.Exists(imgDir))
                 return;
 
+            // 1️⃣ 저장된 파일 로딩
             var files = Directory.GetFiles(imgDir, $"{uid}_T*.png");
 
             foreach (var file in files)
@@ -155,16 +193,15 @@ namespace EOI.Property
                 thumb.Cursor = Cursors.Hand;
                 thumb.Tag = file;
 
-                // ✅ 삭제된 이미지라면 흐리게 표시
+                // 삭제 예정이라면 흐리게 + 테두리 표시
                 if (_matchAlgo.DeletedTemplateList.Contains(file))
                 {
                     thumb.BorderStyle = BorderStyle.FixedSingle;
                     thumb.BackColor = Color.LightGray;
-                    thumb.Enabled = true;
-                    thumb.Image = SetImageOpacity(thumb.Image, 0.4f); // 흐리게
+                    thumb.Image = SetImageOpacity(thumb.Image, 0.4f);
                 }
-                thumb.Click += OnTeachThumbnailClick;
 
+                thumb.Click += OnTeachThumbnailClick;
                 flwTeachList.Controls.Add(thumb);
             }
         }

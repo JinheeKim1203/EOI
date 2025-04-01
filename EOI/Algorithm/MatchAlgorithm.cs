@@ -397,9 +397,9 @@ namespace EOI.Algorithm
                     if (File.Exists(delPath))
                         File.Delete(delPath);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    // 로그나 예외 핸들링
+                    return;
                 }
             }
 

@@ -1,6 +1,7 @@
 ﻿using EOI.Algorithm;
 using EOI.Core;
 using EOI.Teach;
+using EOI.Util;
 using OpenCvSharp.Dnn;
 using OpenCvSharp.Internal.Vectors;
 using System;
@@ -1092,7 +1093,24 @@ namespace EOI
             if (window is null)
                 return;
 
-            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.UpdateImage, _selEntity.LinkedWindow));
+            // 🔥 1. 현재 ROI 사각형 가져오기
+            Rectangle roi = _selEntity.EntityROI;
+
+            // 🔥 2. ROI 영역을 크롭해서 Bitmap 생성
+            Bitmap cropped = new Bitmap(roi.Width, roi.Height);
+            using (Graphics g = Graphics.FromImage(cropped))
+            {
+                g.DrawImage(_bitmapImage,
+                    new Rectangle(0, 0, roi.Width, roi.Height), // 대상
+                    roi, // 원본의 이 영역을
+                    GraphicsUnit.Pixel);
+            }
+
+            // 🔥 3. TeachImageList에 추가
+            window.TeachImageList.Insert(0, cropped); ;
+
+            // 💬 4. 알림 또는 로그 출력
+            SLogger.Write("티칭 이미지가 TeachImageList에 추가되었습니다.");
         }
 
         private void OnUnlockClicked(object sender, EventArgs e)
