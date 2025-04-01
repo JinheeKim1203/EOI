@@ -108,6 +108,9 @@ namespace EOI
         private bool _isCtrlPressed = false;
         private Rectangle _screenSelectedRect = Rectangle.Empty;
 
+        // **jh
+        private bool _isAlignOnInspectOnly = true;
+
         //팝업 메뉴
         private ContextMenuStrip _contextMenu;
 
@@ -724,21 +727,25 @@ namespace EOI
                             offsetMove.Y = _selEntity.EntityROI.Y - linkedWindow.WindowArea.Y;
 
                             // 기준 ROI 외의 다른 ROI도 같이 이동
-                            foreach (DiagramEntity entity in _diagramEntityList)
+                            // **jh
+                            if (_isAlignOnInspectOnly == false)
                             {
-                                if (entity == _selEntity || entity.IsHold)
-                                    continue;
+                                foreach (DiagramEntity entity in _diagramEntityList)
+                                {
+                                    if (entity == _selEntity || entity.IsHold)
+                                        continue;
 
-                                Rectangle roi = entity.EntityROI;
-                                roi.Offset(offsetMove);
-                                entity.EntityROI = roi;
+                                    Rectangle roi = entity.EntityROI;
+                                    roi.Offset(offsetMove);
+                                    entity.EntityROI = roi;
 
-                                if (entity.LinkedWindow != null)
-                                    _selEntity.LinkedWindow.WindowArea = new OpenCvSharp.Rect(
-                                        _selEntity.EntityROI.X,
-                                        _selEntity.EntityROI.Y,
-                                        _selEntity.EntityROI.Width,
-                                        _selEntity.EntityROI.Height); 
+                                    if (entity.LinkedWindow != null)
+                                        _selEntity.LinkedWindow.WindowArea = new OpenCvSharp.Rect(
+                                            _selEntity.EntityROI.X,
+                                            _selEntity.EntityROI.Y,
+                                            _selEntity.EntityROI.Width,
+                                            _selEntity.EntityROI.Height);
+                                }
                             }
                         }
 
