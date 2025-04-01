@@ -33,8 +33,9 @@ namespace EOI.Inspect
         //세부적인 검사 결과
         public string ResultInfos { get; set; }
 
+        //#HN#
         //검사 결과로 찾은 불량 위치
-        public List<Rect> ResultRectList { get; set; } = null;
+        public List<Rect> ResultRectList { get; set; } = new List<Rect>();
 
         public InspResult()
         {

@@ -29,9 +29,9 @@ namespace EOI.Algorithm
         //매칭이 설공했을때, 결과 매칭율
         public int OutScore { get; set; } = 0;
         //찾은 위치
-        public Point OutPoint { get; set; } = new Point(0, 0);
+        public OpenCvSharp.Point OutPoint { get; set; } = new OpenCvSharp.Point(0, 0);
 
-        public List<Point> OutPoints { get; set; } = new List<Point>();
+        public List<OpenCvSharp.Point> OutPoints { get; set; } = new List<OpenCvSharp.Point>();
 
         //템플릿 매칭으로 찾고 싶은 갯수
         public int MatchCount { get; set; } = 1;
@@ -61,6 +61,13 @@ namespace EOI.Algorithm
         {
             if (_templateImage is null)
                 return false;
+
+            // ⬇️ 이부분 추가함: 템플릿이 입력 이미지보다 크면 매칭 수행 불가
+            if (image.Width < _templateImage.Width || image.Height < _templateImage.Height)
+            {
+                Console.WriteLine("MatchTemplate skipped: template is larger than image.");
+                return false;
+            }
 
             Mat result = new Mat();
 
@@ -287,10 +294,16 @@ namespace EOI.Algorithm
             int halfWidth = _templateImage.Width;
             int halfHeight = _templateImage.Height;
 
-            foreach (var point in OutPoints)
+            //#HN# ->함수 내에서 List<T>를 foreach 또는 for문으로 순회 중인데, 다른 스레드 또는 이 루프 안에서 해당 리스트(resultArea)를 수정(추가/삭제/클리어 등) 해서 오류 수정
+            var safeOutPoints = OutPoints.ToList(); // 복사본 만들기
+
+            lock (resultArea)
             {
-                SLogger.Write($"매칭된 위치: {OutPoints}");
-                resultArea.Add(new Rect(point.X, point.Y, _templateImage.Width, _templateImage.Height));
+                foreach (var pt in safeOutPoints)
+                {
+                    SLogger.Write($"매칭된 위치: {pt}");
+                    resultArea.Add(new Rect(pt.X, pt.Y, _templateImage.Width, _templateImage.Height));
+                }
             }
 
             return resultArea.Count;

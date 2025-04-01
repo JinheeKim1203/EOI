@@ -77,9 +77,6 @@ namespace EOI.Core
             }
         }
 
-        //#INSP WORKER#1 1개만 있던 InspWindow를 리스트로 변경하여, 여러개의 ROI를 관리하도록 개선
-        public List<InspWindow> InspWindowList { get; set; } = new List<InspWindow>();
-
         public bool LiveMode { get; set; } = false;
 
         public int SelBufferIndex { get; set; } = 0;
@@ -600,6 +597,8 @@ namespace EOI.Core
 
             UpdateProperty(CurModel.InspWindowList[0]);// **추가** 검사 결과를 바로 확인하기 위해 추가 2025.03.31
             
+
+            UpdateDiagramEntity();
 
             return true;
         }

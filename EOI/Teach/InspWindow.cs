@@ -7,7 +7,6 @@ using EOI.Algorithm;
 using OpenCvSharp;
 using EOI.Core;
 using System.Security.Policy;
-using System.Drawing;
 using System.IO;
 using System.Xml.Serialization;
 using EOI.Setting;
@@ -31,10 +30,29 @@ namespace EOI.Teach
         public string Name { get; set; }
         public string UID { get; set; }
 
-        public Rect WindowArea { get; set; }
-        public Rect InspArea { get; set; }
+        private Rect _windowArea = new Rect();
 
+        public Rect WindowArea
+        {
+            get
+            {
+                return _windowArea;
+            }
+            set
+            {
+                _windowArea = value;
+                InspArea = _windowArea;
+            }
+        }
+        public Rect InspArea { get; set; }
+        
+        //#HN#
+        //public System.Drawing.Rectangle ExpandRect { get; set; }
+        public InspWindowType Type { get; set; }
         public bool IsTeach { get; set; } = false;
+        public List<InspWindow> InspWindowList { get; set; } = new List<InspWindow>();
+
+
 
         //#ABSTRACT ALGORITHM#9 개별 변수로 있던, MatchAlgorithm과 BlobAlgorithm을
         //InspAlgorithm으로 추상화하여 리스트로 관리하도록 변경
@@ -142,7 +160,7 @@ namespace EOI.Teach
 
         //#ABSTRACT ALGORITHM#12 클래스 내에서, 인자로 입력된 타입의 알고리즘을 검사하거나,
         ///모든 알고리즘을 검사하는 옵션을 가지는 검사 함수
-        public virtual bool DoInpsect(InspectType inspType)
+        public virtual bool DoInspect(InspectType inspType)
         {
             foreach (var inspAlgo in AlgorithmList)
             {

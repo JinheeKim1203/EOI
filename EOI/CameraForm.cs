@@ -21,6 +21,9 @@ namespace EOI
 {
     public partial class CameraForm : DockContent
     {
+        //#HN#
+        public ImageViewCCtrl ImageViewCCtrl { get; set; }
+
         //# SAVE ROI#1 현재 선택된 이미지 채널 저장을 위한 변수
         eImageChannel _currentImageChannel = eImageChannel.Color;
 
@@ -224,7 +227,7 @@ namespace EOI
                             EntityROI = new Rectangle(
                                 member.WindowArea.X, member.WindowArea.Y,
                                 member.WindowArea.Width, member.WindowArea.Height),
-                            EntityColor = imageViewer.GetWindowColor(member.InspWindowType),
+                            EntityColor = ImageViewCCtrl.GetWindowColor(member.InspWindowType),
                             IsHold = member.IsTeach,
                         };
                         diagramEntityList.Add(entity);
@@ -232,13 +235,16 @@ namespace EOI
                 }
                 else if (window.Parent == null)
                 {
-                    DiagramEntity entity = new DiagramEntity()
+                    DiagramEntity entity = new DiagramEntity() //#HN#->WindowArea를 InspArea로 바꿈
                     {
                         LinkedWindow = window,
                         EntityROI = new Rectangle(
-                            window.WindowArea.X, window.WindowArea.Y,
+                            window.InspArea.X, window.InspArea.Y,
                                 window.WindowArea.Width, window.WindowArea.Height),
-                        EntityColor = imageViewer.GetWindowColor(window.InspWindowType),
+                        //EntityROI = new Rectangle(
+                        //    window.InspArea.X, window.InspArea.Y,
+                        //        window.InspArea.Width, window.InspArea.Height),
+                        EntityColor = ImageViewCCtrl.GetWindowColor(window.InspWindowType),
                         IsHold = window.IsTeach
                     };
                     diagramEntityList.Add(entity);

@@ -1,6 +1,7 @@
 ﻿using EOI.Util;
 using MvCamCtrl.NET;
 using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
