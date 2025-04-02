@@ -67,46 +67,52 @@ namespace MessagingLibrary
 
 		public override bool Connect()
 		{
-			_task = Task<bool>.Factory.StartNew(() =>
-			{
-				// 서버에서 보내온 메시지 수신 위해 콜백 메시지에서 이벤트 등록한다.
-				var messageDuplexCallback = new MessageDuplexCallback();
-				messageDuplexCallback.ServiceCallbackEvent += MessageDuplexCallback_ServiceCallbackEvent;
+            int timeout = 5000;
 
-				var instanceContext = new InstanceContext(messageDuplexCallback);
-				instanceContext.Opened += InstanceContext_Opened;
-				instanceContext.Closed += InstanceContext_Closed;
-				instanceContext.Closing += InstanceContext_Closed;
+            _task = Task<bool>.Factory.StartNew(() =>
+            {
+                // 서버에서 보내온 메시지 수신 위해 콜백 메시지에서 이벤트 등록한다.
+                var messageDuplexCallback = new MessageDuplexCallback();
+                messageDuplexCallback.ServiceCallbackEvent += MessageDuplexCallback_ServiceCallbackEvent;
 
-				var binding = _bindingType == BindingType.Tcp ? GetTcpBinding() : GetPipeBinding();// new NetNamedPipeBinding(NetNamedPipeSecurityMode.None);
-				string address = _bindingType == BindingType.Tcp ? GetTcpAddress() : GetPipeAddress();
+                var instanceContext = new InstanceContext(messageDuplexCallback);
+                instanceContext.Opened += InstanceContext_Opened;
+                instanceContext.Closed += InstanceContext_Closed;
+                instanceContext.Closing += InstanceContext_Closed;
 
-				Uri uri = new Uri(address);
-				var endpointAddress = new EndpointAddress(uri);
+                var binding = _bindingType == BindingType.Tcp ? GetTcpBinding() : GetPipeBinding();// new NetNamedPipeBinding(NetNamedPipeSecurityMode.None);
+                string address = _bindingType == BindingType.Tcp ? GetTcpAddress() : GetPipeAddress();
 
-				_duplexClientImpl = new DuplexClientImpl(instanceContext, binding, endpointAddress);
-				_duplexClientImpl.Closed += _duplexClientImpl_Closed;
-				_duplexClientImpl.Opened += _duplexClientImpl_Opened;
+                Uri uri = new Uri(address);
+                var endpointAddress = new EndpointAddress(uri);
 
-				try
-				{
-					_duplexClientImpl.Connect();
-					return true;
-				}
-				catch (Exception ex)
-				{				
-					Debug.WriteLine(ex.Message); 
+                _duplexClientImpl = new DuplexClientImpl(instanceContext, binding, endpointAddress);
+                _duplexClientImpl.Closed += _duplexClientImpl_Closed;
+                _duplexClientImpl.Opened += _duplexClientImpl_Opened;
 
-					OnClosed(this, null);
-					return false;
-				}
+                try
+                {
+                    _duplexClientImpl.Connect();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
 
-			}, TaskCreationOptions.LongRunning);
+                    OnClosed(this, null);
+                    return false;
+                }
 
-			_task.Wait();
+            }, TaskCreationOptions.LongRunning);
 
-			return _task.Result;
-		}
+            if (!_task.Wait(timeout))
+            {
+                Debug.WriteLine("Server connect timeout!");
+                return false;
+            }
+
+            return _task.Result;
+        }
 		private void InstanceContext_Opened(object sender, EventArgs e)
 		{
 			//throw new NotImplementedException();

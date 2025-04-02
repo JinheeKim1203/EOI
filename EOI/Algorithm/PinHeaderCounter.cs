@@ -66,7 +66,7 @@ namespace EOI.Algorithm
             foreach (var contour in contours)
             {
                 var rect = Cv2.BoundingRect(contour);
-                if (rect.Width < 25 && rect.Height > 70) // 2025.04.01 **수정** 수치 수정 (30, 70)
+                if (rect.Width < 40 && rect.Height > 90) // 2025.04.01 **수정** 수치 수정 (30, 70)
                 {
                     matchedRects.Add(rect);
                 }

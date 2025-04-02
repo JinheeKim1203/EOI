@@ -21,6 +21,7 @@ using System.Security.Policy;
 using System.ServiceModel.Configuration;
 using System.ServiceModel.Description;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -279,7 +280,7 @@ namespace EOI.Core
             if (LiveMode)
             {
                 SLogger.Write("Grab");
-                await Task.Delay(100);  // 비동기 대기
+                await Task.Delay(50);  // 비동기 대기 **수정** 2025.04.02
                 _grabManager.Grab(bufferIndex, true);  // 다음 촬영 시작
             }
         }
@@ -560,10 +561,10 @@ namespace EOI.Core
             }
 
             string inspImagePath = _model.InspectImagePath;
-            if (File.Exists(inspImagePath))
-            {
-                Global.Inst.InspStage.SetImageBuffer(inspImagePath);
-            }
+            //if (File.Exists(inspImagePath))
+            //{
+            //    Global.Inst.InspStage.SetImageBuffer(inspImagePath);
+            //}
 
             UpdateDiagramEntity();
 
@@ -583,6 +584,8 @@ namespace EOI.Core
 
         public void CycleInspect(bool isCycle)
         {
+            UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
             string inspImagePath = CurModel.InspectImagePath;
             if (inspImagePath == "")
                 return;
@@ -606,7 +609,12 @@ namespace EOI.Core
         {
             if(UseCamera)
             {
-                if(!Grab(0))
+                SLogger.Write("카메라 그랩 스타트");
+
+                Thread.Sleep(5000); // 검사를 다하고 이미지를 찍음. **추가했지만 솔직히 의미없는거 같음**
+
+                SLogger.Write("카메라 그랩 종료");
+                if (!Grab(0))
                     return false;
             }
             else
@@ -617,7 +625,9 @@ namespace EOI.Core
 
             bool isDefect = false;
             if (!_inspWorker.RunInspect(out isDefect))
-                return false;            
+                return false;
+
+            //Thread.Sleep(5000); //  **추가** 2025.04.02 검사시 잔상이 남아서 추가.
 
             UpdateProperty(CurModel.InspWindowList[0]);// **추가** 검사 결과를 바로 확인하기 위해 추가 2025.03.31
             
@@ -704,6 +714,7 @@ namespace EOI.Core
                         //#WCF_FSM#5 카메라 촬상 후, 검사 진행
                         SLogger.Write("MMI : InspStart", SLogger.LogType.Info);
 
+                        Thread.Sleep(500); // **추가 2025.04.02** 검사 시작 전에 잠시 대기
                         //검사 시작
                         string errMsg = "";
 

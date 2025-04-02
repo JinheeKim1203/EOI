@@ -99,7 +99,7 @@ namespace EOI.Setting
 
         public SettingXml() { }
 
-        public string MachineName { get; set; } = "Jidam";
+        public string MachineName { get; set; } = "VISION03";
         
         public MachineType MachineType { get; set; } = MachineType.SMT;
 
@@ -108,7 +108,7 @@ namespace EOI.Setting
         public CameraType CamType { get; set; } = CameraType.WebCam;
 
         public CommunicatorType CommType { get; set; }
-        public string CommIP { get; set; } = "127.0.0.1";
+        public string CommIP { get; set; } = "192.168.1.117";
 
     }
 }
