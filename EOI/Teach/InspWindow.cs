@@ -298,7 +298,21 @@ namespace EOI.Teach
                 {
                     string fileName = $"{UID}_T{i + 1:D3}.png";
                     string savePath = Path.Combine(imgDir, fileName);
-                    TeachImageList[i].Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
+                    try
+                    {
+                        // 파일이 열려 있거나 이미 존재하는 경우 덮어쓰기 전에 삭제
+                        if (File.Exists(savePath))
+                            File.Delete(savePath);
+
+                        using (Bitmap bmp = new Bitmap(TeachImageList[i])) // 복사본 생성
+                        {
+                            bmp.Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"이미지 저장 실패: {fileName}\n{ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
 
