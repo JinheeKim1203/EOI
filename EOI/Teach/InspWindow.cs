@@ -61,8 +61,9 @@ namespace EOI.Teach
 
         //#MODEL SAVE#6 Xml Serialize를 위해서, Element을 명확하게 알려줘야 함
         [XmlElement("InspAlgorithm")]
+      
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
-
+        //부모-자식 관계를 위한 변수 추가
         [XmlIgnore] 
         public InspWindow Parent { get; set; }
 
@@ -188,6 +189,20 @@ namespace EOI.Teach
 
             return true;
         }
+
+        public bool IsDefect()
+        {
+            foreach (InspAlgorithm algo in AlgorithmList)
+            {
+                if (!algo.IsInspected)
+                    continue;
+
+                if (algo.IsDefect)
+                    return true;
+            }
+            return false;
+        }
+
 
         public virtual bool OffsetMove(OpenCvSharp.Point offset)
         {

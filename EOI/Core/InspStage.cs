@@ -76,6 +76,9 @@ namespace EOI.Core
                 return _imageLoader;
             }
         }
+        //#INSP WORKER#1 1개만 있던 InspWindow를 리스트로 변경하여, 여러개의 ROI를 관리하도록 개선
+        public List<InspWindow> InspWindowList { get; set; } = new List<InspWindow>();
+
 
         public bool LiveMode { get; set; } = false;
 
@@ -128,8 +131,8 @@ namespace EOI.Core
                 InitModelGrab(MAX_GRAB_BUF);
             }
 
-            //VisionSequence.Inst.InitSequence();
-            //VisionSequence.Inst.SeqCommand += SeqCommand;
+            VisionSequence.Inst.InitSequence();
+            VisionSequence.Inst.SeqCommand += SeqCommand;
 
 
             return true;
@@ -612,7 +615,8 @@ namespace EOI.Core
                     return false;
             }
 
-            if (!_inspWorker.RunInspect()) // 무조건적으로 검사가 끝나고 난 후 이미지가 나오게 실행. (Contour한정)
+            bool isDefect = false;
+            if (!_inspWorker.RunInspect(out isDefect))
                 return false;            
 
             UpdateProperty(CurModel.InspWindowList[0]);// **추가** 검사 결과를 바로 확인하기 위해 추가 2025.03.31
@@ -627,6 +631,8 @@ namespace EOI.Core
         {
             if (_inspWorker != null)
                 _inspWorker.Stop();
+
+            VisionSequence.Inst.StopAutoRun();
         }
 
         public bool VirtualGrab()
@@ -651,61 +657,74 @@ namespace EOI.Core
         {
             switch (seqCmd)
             {
-                case SeqCmd.OpenRecipe:
-                    {
-                        SLogger.Write("MMI : OpenRecipe", SLogger.LogType.Info);
+                //case SeqCmd.OpenRecipe:
+                //    {
+                //        SLogger.Write("MMI : OpenRecipe", SLogger.LogType.Info);
 
-                        string modelName = (string)Param;
-                        string modelPath = Path.Combine(SettingXml.Inst.ModelDir, modelName, modelName + ".xml");
+                //        string modelName = (string)Param;
+                //        string modelPath = Path.Combine(SettingXml.Inst.ModelDir, modelName, modelName + ".xml");
 
-                        string errMsg = "";
+                //        string errMsg = "";
 
-                        if (File.Exists(modelPath))
-                        {
-                            if (!LoadModel(modelPath))
-                                errMsg = "모델 열기 실패!";
-                        }
-                        else
-                        {
-                            errMsg = $"{modelName}이 존재하지 않습니다!";
-                        }
+                //        if (File.Exists(modelPath))
+                //        {
+                //            if (!LoadModel(modelPath))
+                //                errMsg = "모델 열기 실패!";
+                //        }
+                //        else
+                //        {
+                //            errMsg = $"{modelName}이 존재하지 않습니다!";
+                //        }
 
-                        VisionSequence.Inst.VisionCommand(Vision2Mmi.ModeLoaded, errMsg);
-                    }
-                    break;
-                case SeqCmd.InspReady:
-                    {
-                        SLogger.Write("MMI : InspReady", SLogger.LogType.Info);
+                //        VisionSequence.Inst.VisionCommand(Vision2Mmi.ModeLoaded, errMsg);
+                //    }
+                //    break;
+                //case SeqCmd.InspReady:
+                //    {
+                //        SLogger.Write("MMI : InspReady", SLogger.LogType.Info);
 
-                        //검사 모드 진입
-                        string errMsg = "";
+                //        //검사 모드 진입
+                //        string errMsg = "";
 
-                        MessagingLibrary.Message msg = (MessagingLibrary.Message)Param;
-                        if (!InspectReady(msg.LotNumber, msg.SerialID))
-                        {
-                            errMsg = string.Format("Inspection not ready");
-                            SLogger.Write(errMsg, SLogger.LogType.Error);
-                        }
+                //        if(Param != null)
+                //        {
+                //            MessagingLibrary.Message msg = (MessagingLibrary.Message)Param;
+                //            if (!InspectReady(msg.LotNumber, msg.SerialID))
+                //            {
+                //                errMsg = string.Format("Inspection not ready");
+                //                SLogger.Write(errMsg, SLogger.LogType.Error);
+                //            }
+                //        }
 
-                        VisionSequence.Inst.VisionCommand(Vision2Mmi.InspReady, errMsg);
-                    }
-                    break;
+                //        VisionSequence.Inst.VisionCommand(Vision2Mmi.InspReady, errMsg);
+                //    }
+                //    break;
                 case SeqCmd.InspStart:
                     {
+                        //#WCF_FSM#5 카메라 촬상 후, 검사 진행
                         SLogger.Write("MMI : InspStart", SLogger.LogType.Info);
 
                         //검사 시작
                         string errMsg = "";
 
-                        MessagingLibrary.Message msg = (MessagingLibrary.Message)Param;
-                        _serialID = msg.SerialID;
-                        if (!OneCycle())
+                        if (UseCamera)
+                        {
+                            if (!Grab(0))
+                            {
+                                errMsg = string.Format("Failed to grab");
+                                SLogger.Write(errMsg, SLogger.LogType.Error);
+                            }
+                        }
+
+                        bool isDefect = false;
+                        if (!_inspWorker.RunInspect(out isDefect))
                         {
                             errMsg = string.Format("Failed to inspect");
                             SLogger.Write(errMsg, SLogger.LogType.Error);
                         }
 
-                        VisionSequence.Inst.VisionCommand(Vision2Mmi.InspDone, errMsg);
+                        //#WCF_FSM#6 비젼 -> 제어에 검사 완료 및 결과 전송
+                        VisionSequence.Inst.VisionCommand(Vision2Mmi.InspDone, isDefect);
                     }
                     break;
                 case SeqCmd.InspEnd:
@@ -733,6 +752,33 @@ namespace EOI.Core
             LiveMode = false;
             UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
 
+            return true;
+        }
+
+        public bool StartAutoRun()
+        {
+            SLogger.Write("Action : StartAutoRun");
+
+            string modelPath = CurModel.ModelPath;
+            if (modelPath == "")
+            {
+                SLogger.Write("열려진 모델이 없습니다!", SLogger.LogType.Error);
+                MessageBox.Show("열려진 모델이 없습니다!");
+                return false;
+            }
+
+            if (_grabManager is null)
+            {
+                SLogger.Write("카메라가 설정되지 않았습니다!", SLogger.LogType.Error);
+                MessageBox.Show("카메라가 설정되지 않았습니다!");
+                return false;
+            }
+
+            LiveMode = false;
+            UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
+            string modelName = Path.GetFileNameWithoutExtension(modelPath);
+            VisionSequence.Inst.StartAutoRun(modelName);
             return true;
         }
 

@@ -122,8 +122,9 @@ namespace EOI.Inspect
         }
         //#HN#
         //#INSP WORKER#2 InspStage내의 모든 InspWindow들을 검사하는 함수
-        public bool RunInspect()
+        public bool RunInspect(out bool isDefect)
         {
+            isDefect = false;
             Model curMode = Global.Inst.InspStage.CurModel;
             List<InspWindow> inspWindowList = curMode.InspWindowList;
 
@@ -149,6 +150,9 @@ namespace EOI.Inspect
             {
                 if (inspWindow == null)
                     continue;
+               
+                if (!isDefect && inspWindow.IsDefect())
+                    isDefect = true;
 
                 //inspWindow.DoInspect(InspectType.InspNone);
                 DisplayResult(inspWindow, InspectType.InspNone);
@@ -182,7 +186,8 @@ namespace EOI.Inspect
             }
             else
             {
-                RunInspect(); // 해당 InspWindow(ROI)에 적용된 모든 알고리즘을 검사.
+                bool isDefect = false;
+                RunInspect(out isDefect);
             }
             // 결과창에 검사 결과 출력.
             ResultForm resultForm = MainForm.GetDockForm<ResultForm>();
