@@ -108,7 +108,7 @@ namespace EOI.Setting
         public CameraType CamType { get; set; } = CameraType.WebCam;
 
         public CommunicatorType CommType { get; set; }
-        public string CommIP { get; set; } = "192.168.1.117";
+        public string CommIP { get; set; } = "192.168.1.23";
 
     }
 }

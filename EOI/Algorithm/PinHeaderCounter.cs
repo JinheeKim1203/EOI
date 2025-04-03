@@ -58,7 +58,7 @@ namespace EOI.Algorithm
                 grayImage = targetImage;
             
             Mat binary = new Mat();
-            Cv2.Threshold(grayImage, binary, 100, 255, ThresholdTypes.Binary);
+            Cv2.Threshold(grayImage, binary, 90, 255, ThresholdTypes.Binary);
 
             Cv2.FindContours(binary, out Point[][] contours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
 
@@ -66,7 +66,7 @@ namespace EOI.Algorithm
             foreach (var contour in contours)
             {
                 var rect = Cv2.BoundingRect(contour);
-                if (rect.Width < 40 && rect.Height > 90) // 2025.04.01 **수정** 수치 수정 (30, 70)
+                if (rect.Width < 40 && rect.Height > 100) // 2025.04.01 **수정** 수치 수정 (30, 70)
                 {
                     matchedRects.Add(rect);
                 }
@@ -83,6 +83,11 @@ namespace EOI.Algorithm
         
             result = pinCount != 4 ? "불량" : "양품";
 
+            IsDefect = (pinCount != 4) ? true : false;
+            string defectInfo = IsDefect ? "NG" : "OK";
+            string resultInfo = $"[{defectInfo}] 결과 : {pinCount}";
+            ResultString.Add(resultInfo);
+
             ImageChanged?.Invoke(this, EventArgs.Empty);  // **jh 이벤트 발생
 
             // 필요 시 디버깅 이미지 표시 (운영 버전에서는 주석 처리 가능)
@@ -91,10 +96,10 @@ namespace EOI.Algorithm
             //Cv2.ImShow("Detected Pins", _resultImage);
             //Cv2.WaitKey();
 
-            
+
             //prop.SetReturnImg(_resultImage, result);
 
-
+            IsInspected = true;
             return true;
         }
     }

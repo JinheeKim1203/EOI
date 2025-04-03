@@ -84,7 +84,7 @@ namespace EOI.Teach
                     break;
                 case InspWindowType.Chip:
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
-                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    //inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     break;
                 case InspWindowType.PinHeaderCount: //**수정**
                     //inspWindow.AddInspAlgorithm(InspectType.InspMatch);
