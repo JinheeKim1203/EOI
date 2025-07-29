@@ -139,9 +139,6 @@ namespace EOI.Property
 
             string imgDir = Path.Combine(Path.GetDirectoryName(modelPath), "Images");
 
-            // 2️⃣ TeachImageList에만 있는 "New" 이미지 표시
-            //var savedPaths = new HashSet<string>(files); // 빠른 검색용
-
             var teachList = _matchAlgo?.LinkedWindow?.TeachImageList;
             if (teachList != null)
             {
@@ -164,7 +161,7 @@ namespace EOI.Property
                     newThumb.Cursor = Cursors.Hand;
                     newThumb.Tag = null; // 파일 경로 없음
 
-                    // 🟧 새로 추가된 이미지는 주황색 테두리
+                    // 새로 추가된 이미지는 연두색 배경
                     newThumb.BorderStyle = BorderStyle.FixedSingle;
                     newThumb.BackColor = Color.LightGreen;
                     newThumb.Tag = "new";
@@ -176,11 +173,11 @@ namespace EOI.Property
                 }
             }
 
-            // ⛔ ROI가 없어도 Images 폴더는 없을 수 있음.없으면 그냥 return
+            // ROI가 없어도 Images 폴더는 없을 수 있음.없으면 그냥 return
             if (!Directory.Exists(imgDir))
                 return;
 
-            // 1️⃣ 저장된 파일 로딩
+            // 1저장된 파일 로딩
             var files = Directory.GetFiles(imgDir, $"{uid}_T*.png");
 
             foreach (var file in files)
@@ -213,12 +210,12 @@ namespace EOI.Property
             if (pb?.Tag is string path && File.Exists(path))
             {
 
-                _selectedTemplatePath = path; // ✅ 경로 저장
+                _selectedTemplatePath = path; // 경로 저장
 
                 picTeachImage.Image?.Dispose();
                 picTeachImage.Image = Image.FromFile(path);
 
-                // ✅ 삭제된 이미지라면 복구 버튼 활성화
+                // 삭제된 이미지라면 복구 버튼 활성화
                 btnUndoDeleteTeachImage.Enabled = _matchAlgo.DeletedTemplateList.Contains(path);
             }
         }
@@ -227,7 +224,7 @@ namespace EOI.Property
         // **jh
         private void btnDeleteTeachImage_Click(object sender, EventArgs e)
         {
-            // 🔐 먼저 경로가 저장돼 있는지 확인
+            // 경로가 저장돼 있는지 확인
             if (string.IsNullOrEmpty(_selectedTemplatePath) || !File.Exists(_selectedTemplatePath))
             {
                 MessageBox.Show("삭제할 이미지를 먼저 선택하세요.");
@@ -244,7 +241,7 @@ namespace EOI.Property
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                // 삭제 예약 리스트에 추가 ✅
+                // 삭제 예약 리스트에 추가 
                 _matchAlgo?.DeletedTemplateList.Add(_selectedTemplatePath);
 
                 // 경로 초기화
@@ -253,6 +250,7 @@ namespace EOI.Property
                 // 썸네일 갱신
                 RefreshTeachImageList();
             }
+            //예외 사항 생기면 추가
             catch (Exception ex)
             {
                 MessageBox.Show($"이미지 삭제 중 오류 발생: {ex.Message}");
@@ -295,7 +293,7 @@ namespace EOI.Property
                 return;
             }
 
-            // ✅ 삭제 예약 취소
+            // 삭제 예약 취소
             _matchAlgo.DeletedTemplateList.Remove(_selectedTemplatePath);
 
             MessageBox.Show("삭제 취소되었습니다.");

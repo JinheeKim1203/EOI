@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Data.Linq;
 using System.Threading;
+using System.Xml.Serialization;
 
 namespace EOI.Algorithm
 {
     //#BINARY FILTER#1 이진화 필터를 위한 클래스
 
 
-    //이진화 임계값 설정을 구조체로 만들기
+    //이진화 임계값 설정 구조체
     public struct BinaryThreshold
     {
         public int lower;
@@ -26,7 +27,7 @@ namespace EOI.Algorithm
 
         public BinaryThreshold BinThreshold { get; set; } = new BinaryThreshold();
 
-        //픽셀 영역으로 이진화 필터
+        //픽셀 영역으로 이진화 필터 (기본값 설정)
         public int AreaMin { get; set; } = 50;
         public int AreaMax { get; set; } = 500;
 
@@ -37,6 +38,9 @@ namespace EOI.Algorithm
         public int HeightMax { get; set; } = 0;
         public int BlobCount { get; set; } = 0;
         public int OutBlobCount { get; set; } = 0;
+
+        [XmlIgnore]
+        public List<double> AreaList { get; set; } = new List<double>();
 
         public int IterationsNum { get; set; } = 1;
 
@@ -115,8 +119,10 @@ namespace EOI.Algorithm
             return true;
         }
 
-        //#BINARY FILTER#3 이진화 필터처리 함수
-        private bool BlobFilter(Mat binImage, int areaMin, int areaMax, int widthMin, int widthMax, int heightMin, int heightMax)
+        //이진화 필터처리 함수
+        private bool BlobFilter(Mat binImage, int areaMin,
+            int areaMax, int widthMin, int widthMax, 
+            int heightMin, int heightMax)
         {
             // 컨투어 찾기
             Point[][] contours;
@@ -132,6 +138,8 @@ namespace EOI.Algorithm
             _findArea.Clear();
 
             int findBlobCount = 0;
+
+            AreaList.Clear();
 
             foreach (var contour in contours)
             {
@@ -168,11 +176,14 @@ namespace EOI.Algorithm
                 Rect blobRect = boundingRect + InspRect.TopLeft;
 
                 string blobInfo;
-                blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, Size({blobRect.Width},{blobRect.Height})"; //**수정**
+                blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, " +
+                    $"Size({blobRect.Width},{blobRect.Height})"; 
                 ResultString.Add(blobInfo);
 
                 _findArea.Add(blobRect);
+                AreaList.Add(area);
             }
+
 
             OutBlobCount = findBlobCount;
 

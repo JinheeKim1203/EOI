@@ -81,37 +81,6 @@ namespace EOI
             _allTabs[tabName] = newTab;
         }
 
-        // **jh
-        private void LoadDualOptionControl(InspectType topType, InspectType bottomType)
-        {
-            string tabName = $"{topType}_{bottomType}";
-
-            // 이미 생성된 듀얼 탭이면 패스
-            foreach (TabPage tabPage in tabPropControl.TabPages)
-            {
-                if (tabPage.Text == tabName)
-                    return;
-            }
-
-            var topControl = CreateUserControl(topType);       // PinHeaderCounterProp
-            var bottomControl = CreateUserControl(bottomType); // MatchInspProp
-
-            if (topControl == null || bottomControl == null)
-                return;
-
-            TabPage newTab = new TabPage(tabName);
-
-            // 도킹 순서 중요: Fill 먼저, Top 나중
-            bottomControl.Dock = DockStyle.Fill;
-            topControl.Dock = DockStyle.Top;
-            topControl.Height = 275;
-
-            newTab.Controls.Add(bottomControl);
-            newTab.Controls.Add(topControl);
-
-            tabPropControl.TabPages.Insert(0, newTab);
-            tabPropControl.SelectedTab = newTab;
-        }
 
         //#PANEL TO TAB#2 속성탭 타입에 맞게 UseControl 생성하여 반환
         private UserControl CreateUserControl(InspectType inspPropType)
@@ -155,26 +124,10 @@ namespace EOI
         // **jh
         public void ShowProperty(InspWindow window)
         {
-            bool hasMatch = false;
-            bool hasPinHeader = false;
-
             foreach (InspAlgorithm algo in window.AlgorithmList)
-            {
-                if (algo.InspectType == InspectType.InspMatch)
-                    hasMatch = true;
-                else if (algo.InspectType == InspectType.PinHeaderCounter)
-                    hasPinHeader = true;
-                else
-                    LoadOptionControl(algo.InspectType); // 일반 단일 컨트롤 탭 생성
+            { 
+                    LoadOptionControl(algo.InspectType);
             }
-
-            if (hasMatch || hasPinHeader)
-            {
-                // Match와 PinHeader 둘 중 하나라도 있으면 듀얼 탭 한 번 생성
-                LoadDualOptionControl(InspectType.PinHeaderCounter, InspectType.InspMatch);
-            }
-
-            tabPropControl.SelectedIndex = 0;
         }
 
         public void ResetProperty()
@@ -190,28 +143,7 @@ namespace EOI
 
             foreach (TabPage tabPage in tabPropControl.TabPages)
             {
-                // 듀얼 탭일 경우: 컨트롤이 2개 있음
-                if (tabPage.Controls.Count == 2)
-                {
-                    var bottomUC = tabPage.Controls[0] as UserControl; // Fill
-                    var topUC = tabPage.Controls[1] as UserControl;    // Top
-
-                    if (topUC is PinHeaderCounterProp pinHeaderProp)
-                    {
-                        var algo = window.FindInspAlgorithm(InspectType.PinHeaderCounter) as PinHeaderCounter;
-                        if (algo != null)
-                            pinHeaderProp.SetAlgorithm(algo);
-                    }
-
-                    if (bottomUC is MatchInspProp matchProp)
-                    {
-                        var algo = window.FindInspAlgorithm(InspectType.InspMatch) as MatchAlgorithm;
-                        if (algo != null)
-                            matchProp.SetAlgorithm(algo);
-                    }
-                }
-                // 일반 단일 탭
-                else if (tabPage.Controls.Count == 1)
+                if (tabPage.Controls.Count > 0)
                 {
                     UserControl uc = tabPage.Controls[0] as UserControl;
 
@@ -219,7 +151,10 @@ namespace EOI
                     {
                         var algo = window.FindInspAlgorithm(InspectType.InspMatch) as MatchAlgorithm;
                         if (algo != null)
-                            matchProp.SetAlgorithm(algo);
+
+                            window.PatternLearn();
+
+                        matchProp.SetAlgorithm(algo);
                     }
                     else if (uc is BinaryInspProp binaryProp)
                     {

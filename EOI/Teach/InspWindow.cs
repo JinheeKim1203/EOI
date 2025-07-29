@@ -76,7 +76,7 @@ namespace EOI.Teach
         [XmlIgnore]
         public Mat WindowImage { get; set; }
 
-        // **jh ✅ 티칭 이미지 리스트 (이미지뷰에서 ROI 크롭 후 저장되는 리스트)
+        // **jh 티칭 이미지 리스트 (이미지뷰에서 ROI 크롭 후 저장되는 리스트)
         [XmlIgnore]
         public List<Bitmap> TeachImageList { get; set; } = new List<Bitmap>();
 
@@ -98,7 +98,7 @@ namespace EOI.Teach
             return true;
         }
 
-        // **jh ✅ TeachImageList에 이미지 추가
+        // **jh TeachImageList에 이미지 추가
         public void AddTeachImage(Bitmap bitmap)
         {
             if (bitmap == null) return;
@@ -276,7 +276,7 @@ namespace EOI.Teach
             if (curModel is null)
                 return false;
 
-            // ✅ 삭제 예정 이미지가 있는지 확인
+            // 삭제 예정 이미지가 있는지 확인
             foreach (var algo in AlgorithmList)
             {
                 if (algo is MatchAlgorithm matchAlgo && matchAlgo.DeletedTemplateList.Count > 0)
@@ -297,16 +297,16 @@ namespace EOI.Teach
             if (!Directory.Exists(imgDir))
                 Directory.CreateDirectory(imgDir);
 
-            // ✅ MatchAlgorithm 이미지 삭제 + 리네이밍
+            // MatchAlgorithm 이미지 삭제 + 리네이밍
             foreach (var algo in AlgorithmList)
             {
                 if (algo is MatchAlgorithm matchAlgo)
                 {
-                    matchAlgo.CleanupTemplates(); // 🔥 삭제 예약 반영 + T001부터 정렬
+                    matchAlgo.CleanupTemplates(); // 삭제 예약 반영 + T001부터 정렬
                 }
             }
 
-            // ** jh ✅ TeachImageList 저장 (UID_T001.png, UID_T002.png ...) 기존의 바로 저장방식은 삭제
+            // TeachImageList 저장 (UID_T001.png, UID_T002.png ...)
             if (TeachImageList != null && TeachImageList.Count > 0)
             {
                 for (int i = 0; i < TeachImageList.Count; i++)
@@ -343,7 +343,7 @@ namespace EOI.Teach
 
             TeachImageList = new List<Bitmap>();  // ** jh ✅ 새로 초기화
 
-            // ✅ 이미지 리스트 로딩 (UID_T*.png)
+            // 이미지 리스트 로딩 (UID_T*.png)
             var files = Directory.GetFiles(imgDir, $"{UID}_T*.png")
                                  .OrderBy(f => f)  // 정렬: T001, T002 순
                                  .ToList();
@@ -363,13 +363,13 @@ namespace EOI.Teach
                 }
             }
 
-            // ✅ 대표 WindowImage 설정
+            // 대표 WindowImage 설정
             if (TeachImageList.Count > 0)
             {
                 WindowImage = OpenCvSharp.Extensions.BitmapConverter.ToMat(TeachImageList[0]);
             }
 
-            // ✅ MatchAlgorithm의 템플릿 이미지로 설정
+            // MatchAlgorithm의 템플릿 이미지로 설정
             foreach (InspAlgorithm algo in AlgorithmList)
             {
                 if (algo is MatchAlgorithm matchAlgo && WindowImage != null)

@@ -79,7 +79,7 @@ namespace EOI.Teach
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
                 case InspWindowType.Package:
-                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
+                    //inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     break;
                 case InspWindowType.Chip:

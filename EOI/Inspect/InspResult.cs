@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using System.Xml.Serialization;
 
 namespace EOI.Inspect
 {
@@ -32,6 +33,8 @@ namespace EOI.Inspect
         public string ResultValue { get; set; }
         //세부적인 검사 결과
         public string ResultInfos { get; set; }
+        [XmlIgnore]
+        public List<double> AreaList { get; set; } = new List<double>();
 
         //#HN#
         //검사 결과로 찾은 불량 위치

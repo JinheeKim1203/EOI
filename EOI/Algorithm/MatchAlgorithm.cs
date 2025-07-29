@@ -24,8 +24,7 @@ namespace EOI.Algorithm
 
         //찾을 이미지의 매칭율
         public int MatchScore { get; set; } = 60;
-        //입력된 이미지에서 실제로 검색할 영역 설정, 속도 향상을 위해,
-        //입력된 ROI 기준으로 ExtSize만큼 확장하여, 그 영역에서 찾음
+        //입력된 ROI 기준으로 ExtSize만큼 확장하여, 그 영역에서 찾음(속도 향상)
         public Size ExtSize { get; set; } = new Size(100, 100);
         //매칭이 설공했을때, 결과 매칭율
         public int OutScore { get; set; } = 0;
@@ -190,7 +189,6 @@ namespace EOI.Algorithm
                         continue;
 
                     // 매칭된 위치 리스트에 추가
-                    //Point matchPos = new Point(bestPoint.X + templateWidth, bestPoint.Y + templateHeight);
                     Point matchPos = bestPoint + leftTopPos;
                     matchedPositions.Add(matchPos);
                     detectedRegions.Add(new Rect(bestPoint.X - halfWidth, bestPoint.Y - halfHeight, templateWidth, templateHeight));

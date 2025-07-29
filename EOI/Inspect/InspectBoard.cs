@@ -66,6 +66,7 @@ namespace EOI.Inspect
                     case InspectType.InspBinary:
                         BlobAlgorithm blobAlgo = algo as BlobAlgorithm;
                         inspResult.ResultValue = $"{blobAlgo.OutBlobCount}/{blobAlgo.BlobCount}";
+                        inspResult.AreaList = new List<double>(blobAlgo.AreaList);
                         break;
                     case InspectType.PinHeaderCounter: // **추가**
                         PinHeaderCounter pinHeaderCounter = algo as PinHeaderCounter;                       

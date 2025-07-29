@@ -371,13 +371,51 @@ namespace EOI
                             if (result.ResultRectList == null)
                                 continue;
 
+                            int areaIndex = 0;
+
                             foreach (var rect in result.ResultRectList)
                             {
                                 Rectangle screenRect = VirtualToScreen(new Rectangle(rect.X, rect.Y, rect.Width, rect.Height));
-                                using (Pen pen = new Pen(Color.Red, 2))
+
+                                // 색상 결정 (Match는 OK/NG, Blob은 고정)
+                                Color boxColor = Color.Red; // NG
+                                string resultText = "";
+
+                                if (result.InspType == InspectType.InspMatch)
+                                {
+                                    int score = 0;
+                                    if (window.FindInspAlgorithm(InspectType.InspMatch) is MatchAlgorithm match)
+                                    {
+                                        score = match.OutScore;
+                                        boxColor = match.IsDefect ? Color.Red : Color.Lime;
+                                        resultText = $"Score: {score}%";
+                                    }
+                                }
+                                else if (result.InspType == InspectType.InspBinary &&
+                                      window.FindInspAlgorithm(InspectType.InspBinary) is BlobAlgorithm blob &&
+                                      blob.AreaList != null && areaIndex < blob.AreaList.Count)
+                                {
+                                    boxColor = Color.Coral;
+                                    resultText = $"A : {blob.AreaList[areaIndex]:F0}";
+                                }
+
+                                using (Pen pen = new Pen(boxColor, 2))
                                 {
                                     g.DrawRectangle(pen, screenRect);
                                 }
+
+                                // 텍스트 표시
+                                if (!string.IsNullOrWhiteSpace(resultText))
+                                {
+                                    using (Font font = new Font("Arial", 10, FontStyle.Bold))
+                                    using (SolidBrush brush = new SolidBrush(boxColor))
+                                    {
+                                        Point textPos = new Point(screenRect.X, screenRect.Y - 18);
+                                        g.DrawString(resultText, font, brush, textPos);
+                                    }
+                                }
+
+                                areaIndex++;
                             }
                         }
                     }
@@ -1109,7 +1147,7 @@ namespace EOI
                     if (roi.Width <= 0 || roi.Height <= 0)
                         continue;
 
-                    // ✅ ROI 영역을 크롭해서 TeachImageList에 추가
+                    // ROI 영역을 크롭해서 TeachImageList에 추가
                     Bitmap cropped = new Bitmap(roi.Width, roi.Height);
                     using (Graphics g = Graphics.FromImage(cropped))
                     {
@@ -1120,7 +1158,7 @@ namespace EOI
                     }
 
                     window.TeachImageList.Insert(0, cropped); // 최신 이미지 앞에 추가
-                    SLogger.Write($"✅ UID {window.UID} 티칭 이미지 추가됨");
+                    SLogger.Write($"UID {window.UID} 티칭 이미지 추가됨");
                     addedCount++;
                 }
             }

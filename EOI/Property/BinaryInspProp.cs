@@ -164,7 +164,6 @@ namespace EOI.Property
 
             bool invert = chkInvert.Checked;
             bool highlight = chkHighlight.Checked;
-            bool showDeNoise = chkShowDeNoise.Checked; // **추가**
 
             ShowBinaryMode showBinaryMode = ShowBinaryMode.ShowBinaryNone;
             if (highlight)
@@ -282,7 +281,7 @@ namespace EOI.Property
                 MessageBox.Show("숫자만 입력 가능합니다.");
                 txtHeightMax.Text = _blobAlgo.HeightMax.ToString(); // 기존 값 복원
             }
-        }       
+        }
     }
 
     //#BINARY FILTER#9 이진화 관련 이벤트 발생시, 전달할 값 추가
